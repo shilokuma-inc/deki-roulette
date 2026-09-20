@@ -18,7 +18,7 @@ struct RouletteScreen: View {
             Text(L10n.helpAimStealth)
             Text(L10n.helpAimRandom)
         } content: {
-            AdaptiveStack(horizontal: sizeClass == .regular, spacing: 48) {
+            AdaptiveStack(horizontal: regular, alignment: .center, spacing: Theme.Layout.columnSpacing) {
                 wheelSection
                 ItemListView(
                     items: model.items,
@@ -30,7 +30,7 @@ struct RouletteScreen: View {
                     onRemove: { model.removeItem(id: $0) },
                     onLongPress: { model.toggleTarget(id: $0) }
                 )
-                .frame(maxWidth: sizeClass == .regular ? 320 : .infinity)
+                .frame(maxWidth: regular ? Theme.Layout.listWidthRegular : .infinity)
             }
         }
         .onChange(of: model.result) { _, result in
@@ -40,10 +40,12 @@ struct RouletteScreen: View {
         }
     }
 
+    private var regular: Bool { sizeClass == .regular }
+
     private var wheelSection: some View {
         VStack(spacing: 24) {
             RouletteWheelView(items: model.items, rotation: model.rotation)
-                .frame(maxWidth: 320)
+                .frame(maxWidth: regular ? Theme.Layout.wheelMaxWidthRegular : Theme.Layout.wheelMaxWidthCompact)
 
             resultStatus
                 .frame(height: 56)

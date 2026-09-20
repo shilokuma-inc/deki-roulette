@@ -80,7 +80,7 @@ DekiRoulette/
     Roulette/     RouletteModel, RouletteWheelView（盤面）, RouletteScreen
     Order/        OrderModel, OrderResultView, OrderScreen
     Shared/       ItemListView（項目リストと隠しジェスチャ）, MarkDot（印）, PageFrame（共通枠）,
-                  PrimaryActionButton, AdaptiveStack
+                  SettingsView（設定）, PrimaryActionButton, AdaptiveStack
   Localization/   Localizable.xcstrings（日英）, InfoPlist.xcstrings, L10n
   Resources/      Assets.xcassets
 DekiRouletteTests/  Swift Testing によるユニットテスト

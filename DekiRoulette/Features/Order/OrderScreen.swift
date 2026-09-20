@@ -3,6 +3,7 @@ import SwiftUI
 struct OrderScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var model = OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems))
 
     // コピー済みかどうかは「どの結果をコピーしたか」から導く。
@@ -72,7 +73,8 @@ struct OrderScreen: View {
                     .buttonStyle(.plain)
                 }
             }
-            .frame(height: 32)
+            // コピーボタンの有無で上のボタンが動かないよう高さを固定する。大きい文字では最小高さだけ残す
+            .frame(minHeight: 32, maxHeight: TypeLayout.growsFixedAreas(for: typeSize) ? nil : 32)
         }
         .frame(maxWidth: .infinity)
     }
@@ -94,4 +96,9 @@ struct OrderScreen: View {
 
 #Preview {
     OrderScreen()
+}
+
+#Preview("AX5") {
+    OrderScreen()
+        .dynamicTypeSize(.accessibility5)
 }

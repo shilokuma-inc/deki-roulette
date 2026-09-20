@@ -29,4 +29,7 @@ enum Config {
 
     /// コピーできたことを伝える表示を出しておく時間。
     static let copyFeedbackDuration: TimeInterval = 1.8
+
+    /// スピンのイージング（Web 版 `SPIN_EASING`）。`Theme.spinAnimation` と、触覚の発火時刻の逆算の両方で使う。
+    static let spinEasing = CubicBezierCurve(0.15, 0.85, 0.3, 1)
 }

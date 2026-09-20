@@ -31,7 +31,9 @@ GitHub Actions（`.github/workflows/`）。どのワークフローも最初に 
 | `APPLE_API_KEY_BASE64` | App Store Connect API キー (`.p8`) を base64 にしたもの |
 | `APPLE_API_KEY_ID` | 同キーの Key ID |
 | `APPLE_API_ISSUER_ID` | 同キーの Issuer ID |
-| `APPLE_ID` / `APP_SPECIFIC_PASSWORD` | `altool` でのアップロードに使う Apple ID とアプリ用パスワード（Upload のみ） |
+
+署名もアップロードもこの API キーで行う。Upload が通るには、App Store Connect に Bundle ID
+`ml.mrs1669.DekiRoulette` のアプリがあらかじめ登録されている必要がある。
 
 ## 環境
 

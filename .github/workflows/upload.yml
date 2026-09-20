@@ -44,10 +44,11 @@ jobs:
       - name: Create ExportOptions.plist
         run: echo '${{ secrets.EXPORT_OPTIONS }}' > ExportOptions.plist
 
+      # altool は ./private_keys/AuthKey_<Key ID>.p8 を自動で探すので、ファイル名は Key ID にする
       - name: Create private key
         run: |
           mkdir private_keys
-          echo -n '${{ secrets.APPLE_API_KEY_BASE64 }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APPLE_API_ISSUER_ID }}.p8
+          echo -n '${{ secrets.APPLE_API_KEY_BASE64 }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
 
       - name: Export IPA
         run: |
@@ -56,16 +57,17 @@ jobs:
             -exportOptionsPlist ExportOptions.plist \
             -exportPath app.ipa \
             -allowProvisioningUpdates \
-            -authenticationKeyPath "$(pwd)/private_keys/AuthKey_${{ secrets.APPLE_API_ISSUER_ID }}.p8" \
+            -authenticationKeyPath "$(pwd)/private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8" \
             -authenticationKeyID ${{ secrets.APPLE_API_KEY_ID }} \
             -authenticationKeyIssuerID ${{ secrets.APPLE_API_ISSUER_ID }}
 
+      # 書き出しと同じ API キーで認証する。Apple ID 認証は Bundle ID からチームを逆引きするため、
+      # App Store Connect にアプリが無いと「provider public id を決定できない」で止まる
       - name: Upload IPA to App Store Connect
         run: |
-          xcrun altool --upload-app -f app.ipa/DekiRoulette.ipa \
-            -u ${{ secrets.APPLE_ID }} \
-            -p ${{ secrets.APP_SPECIFIC_PASSWORD }} \
-            --type ios
+          xcrun altool --upload-app -f app.ipa/DekiRoulette.ipa --type ios \
+            --apiKey ${{ secrets.APPLE_API_KEY_ID }} \
+            --apiIssuer ${{ secrets.APPLE_API_ISSUER_ID }}
 
       - name: Upload IPA to GitHub
         uses: actions/upload-artifact@v4

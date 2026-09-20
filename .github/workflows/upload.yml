@@ -1,0 +1,74 @@
+name: Upload
+
+# main への push は Archive までにとどめ、TestFlight へのアップロードは作業ブランチと develop / release から行う
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+
+concurrency:
+  group: upload-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  upload:
+    name: ${{ github.ref_name }}
+    runs-on: macos-latest
+
+    steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -project DekiRoulette.xcodeproj \
+            -scheme DekiRoulette \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }}
+
+      - name: Create ExportOptions.plist
+        run: echo '${{ secrets.EXPORT_OPTIONS }}' > ExportOptions.plist
+
+      - name: Create private key
+        run: |
+          mkdir private_keys
+          echo -n '${{ secrets.APPLE_API_KEY_BASE64 }}' | base64 --decode > ./private_keys/AuthKey_${{ secrets.APPLE_API_ISSUER_ID }}.p8
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath app.ipa \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$(pwd)/private_keys/AuthKey_${{ secrets.APPLE_API_ISSUER_ID }}.p8" \
+            -authenticationKeyID ${{ secrets.APPLE_API_KEY_ID }} \
+            -authenticationKeyIssuerID ${{ secrets.APPLE_API_ISSUER_ID }}
+
+      - name: Upload IPA to App Store Connect
+        run: |
+          xcrun altool --upload-app -f app.ipa/DekiRoulette.ipa \
+            -u ${{ secrets.APPLE_ID }} \
+            -p ${{ secrets.APP_SPECIFIC_PASSWORD }} \
+            --type ios
+
+      - name: Upload IPA to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: DekiRoulette.ipa
+          path: app.ipa/DekiRoulette.ipa

@@ -131,6 +131,8 @@ iOS 版はこの仕様を元に移植しており、プラットフォーム差�
 
 - 項目 0 件: 無地の円盤。1 件: 全面 1 色にラベルを中央表示（スピンは不可）。
 - 中央にハブ（暗色の円＋アイボリーの縁と芯）。
+- iOS 版は横並び（`horizontalSizeClass == .regular`、主に iPad）で盤面を最大 480pt に広げる。線幅・縁・ハブは直径に比例させ、
+  上の表の文字数と文字サイズは直径 320pt を基準に、それより大きい盤面では倍率の平方根ずつ緩める（§12）。
 
 ### 5.2 スピン
 
@@ -395,3 +397,4 @@ iOS 版には対応物が無い、または OS が代替する項目。
 | プリレンダ、SEO、sitemap、CSP、hreflang | 無し | Web 固有 |
 | ラベル 20 文字（UTF-16 単位） | 20 文字（`Character` 単位） | 絵文字等の結合文字で差が出る |
 | フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートの「著作権」項目 | 帰属の文（basekeita と Takumi Muraishi の連名）と `© 2026 basekeita, Takumi Muraishi` を載せる。設定の項目は現状これだけ（`SettingsView`） |
+| 盤面 320px、ページ幅 `max-w-3xl`（768px）、`lg` 以上で横並び（§5.1, §9.3） | `horizontalSizeClass == .regular` で横並び。盤面は最大 480pt、項目リストは 360pt、ページ幅は 928pt（`Theme.Layout`）。compact では盤面 320pt のまま | 盤面の線幅・縁・ハブは直径に比例。ラベルは基準 320pt より大きい盤面で、倍率の平方根ずつ文字サイズと最大表示文字数を増やす（`WheelLabel`。480pt では 12 / 8 / 6 文字）。文字サイズも比例させると文字数を増やした分が縁からはみ出すため。横並びの 2 列は上下中央で揃える。iPhone の横向きは非対応のまま（`UISupportedInterfaceOrientations`）。Split View や Stage Manager で幅が狭まると compact の縦積みになる |

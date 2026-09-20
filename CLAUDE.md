@@ -28,6 +28,8 @@ iOS 固有の差分は SPEC.md の「iOS 版との対応」に追記する。
   盤面と開始ボタンの塗りは外観に依らず固定（`onSlice` / `wheel*` / `onFlare`）で、スライス色を文字や
   色見本に使うところは `sliceColor(at:)` ではなく `sliceAccent(at:)` を使う。追加した配色は
   `ThemeContrastTests` でコントラスト比を検証する。
+- レイアウトの寸法（盤面の上限、横並びの列幅、ページ幅）は `Theme.Layout` に置く。`horizontalSizeClass == .regular`
+  で横並びになり、盤面は 480pt まで広がる。盤面ラベルの省略と文字サイズは `WheelLabel`（`Core/`）が直径から決める。
 
 ### スピンの仕組み
 

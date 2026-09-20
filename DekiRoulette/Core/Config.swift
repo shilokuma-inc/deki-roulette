@@ -29,4 +29,7 @@ enum Config {
 
     /// コピーできたことを伝える表示を出しておく時間。
     static let copyFeedbackDuration: TimeInterval = 1.8
+
+    /// スピンの周回数の範囲。フリックの強さもこの範囲の中に写す。
+    static let fullSpinRange: ClosedRange<Int> = 4...8
 }

@@ -78,6 +78,26 @@ struct RouletteModelTests {
         #expect(model.beginSpin(reducedMotion: false) == nil)
     }
 
+    @Test func 結果の添字は針の下のスライスと一致する() throws {
+        for _ in 0..<50 {
+            let model = makeModel()
+            let next = model.beginSpin(reducedMotion: false)!
+            model.rotation = next
+            model.finishSpin()
+            let outcome = try #require(model.outcome)
+            #expect(outcome.index == RouletteMath.indexUnderPointer(rotation: next, count: 4))
+            #expect(outcome.label == model.items[outcome.index].label)
+        }
+    }
+
+    @Test func 同じラベルが並んでいても結果の添字は指定した項目を指す() {
+        let model = makeModel(["A", "A", "A", "A"])
+        model.toggleTarget(id: model.items[2].id)
+        model.rotation = model.beginSpin(reducedMotion: false)!
+        model.finishSpin()
+        #expect(model.outcome == SpinOutcome(index: 2, label: "A"))
+    }
+
     @Test func 項目を触ると結果が消える() {
         let model = makeModel()
         model.rotation = model.beginSpin(reducedMotion: false)!

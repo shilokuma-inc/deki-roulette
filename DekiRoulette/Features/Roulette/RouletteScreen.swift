@@ -60,16 +60,18 @@ struct RouletteScreen: View {
 
     @ViewBuilder
     private var resultStatus: some View {
-        if let result = model.result {
-            Text(result)
+        if let outcome = model.outcome {
+            // 止まったスライスと同じ色で出す
+            let color = Theme.sliceColor(at: outcome.index)
+            Text(outcome.label)
                 .font(.title3.weight(.black))
-                .foregroundStyle(Theme.gold)
+                .foregroundStyle(color)
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
-                .background(Theme.gold.opacity(0.1), in: .rect(cornerRadius: 16))
-                .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Theme.gold.opacity(0.6), lineWidth: 1))
+                .background(color.opacity(0.1), in: .rect(cornerRadius: 16))
+                .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(color.opacity(0.6), lineWidth: 1))
                 .revealOnAppear(reducedMotion: reduceMotion)
-                .id(result + "\(model.rotation)")
+                .id(outcome.label + "\(model.rotation)")
         } else {
             Text(model.spinning ? L10n.spinning : L10n.resultPlaceholder)
                 .font(.caption)

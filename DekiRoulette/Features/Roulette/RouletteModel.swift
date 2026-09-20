@@ -1,6 +1,13 @@
 import Foundation
 import Observation
 
+/// スピンの結果。結果表示の色を止まったスライスに合わせるため、
+/// ラベルだけでなく盤面上の添字も持つ（同じラベルの項目があっても色が一意に決まる）。
+struct SpinOutcome: Equatable {
+    let index: Int
+    let label: String
+}
+
 /// 項目・当たり指定・回転・結果のステートとスピンロジック。Web 版 `useRoulette` に対応する。
 @MainActor
 @Observable
@@ -8,12 +15,12 @@ final class RouletteModel {
     private(set) var items: [Item]
     private(set) var targetId: UUID?
     private(set) var spinning = false
-    private(set) var result: String?
+    private(set) var outcome: SpinOutcome?
 
     /// 累積の回転角（度）。View がアニメーションの中で書き込む。
     var rotation: Double = 0
 
-    private var pendingResult: String?
+    private var pendingOutcome: SpinOutcome?
     private var fallbackTask: Task<Void, Never>?
 
     init(items: [Item]) {
@@ -22,6 +29,8 @@ final class RouletteModel {
 
     var canSpin: Bool { !spinning && items.count >= Config.minItems }
     var atCapacity: Bool { items.count >= Config.maxItems }
+
+    var result: String? { outcome?.label }
 
     var marks: Marks {
         guard let targetId else { return [:] }
@@ -32,19 +41,19 @@ final class RouletteModel {
         let label = ItemLabel.normalize(raw)
         guard !label.isEmpty, !atCapacity else { return }
         items.append(Item(label: label))
-        result = nil
+        outcome = nil
     }
 
     func removeItem(id: UUID) {
         items.removeAll { $0.id == id }
         if targetId == id { targetId = nil }
-        result = nil
+        outcome = nil
     }
 
     /// 長押しで当たりの指定と解除を切り替える。
     func toggleTarget(id: UUID) {
         targetId = targetId == id ? nil : id
-        result = nil
+        outcome = nil
     }
 
     /// スピンを開始し、盤面が止まるべき累積回転角を返す。回せないときは nil。
@@ -62,8 +71,8 @@ final class RouletteModel {
         }
 
         let next = RouletteMath.nextRotation(current: rotation, targetIndex: targetIndex, count: items.count)
-        pendingResult = items[targetIndex].label
-        result = nil
+        pendingOutcome = SpinOutcome(index: targetIndex, label: items[targetIndex].label)
+        outcome = nil
         spinning = true
 
         // 完了コールバックが来ない環境（バックグラウンド等）向けの保険
@@ -81,8 +90,8 @@ final class RouletteModel {
         fallbackTask?.cancel()
         fallbackTask = nil
         spinning = false
-        guard let pendingResult else { return }
-        result = pendingResult
-        self.pendingResult = nil
+        guard let pendingOutcome else { return }
+        outcome = pendingOutcome
+        self.pendingOutcome = nil
     }
 }

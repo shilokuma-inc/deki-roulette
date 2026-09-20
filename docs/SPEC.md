@@ -332,6 +332,7 @@ iOS 版はこの仕様を元に移植しており、プラットフォーム差�
 - 削除ボタンに「{ラベル} を削除」の読み上げ名。
 - フォーカスリングは `gold` 2px。
 - 指定中の行は、印が見えているときだけ `aria-pressed="true"` と先頭／末尾のテキストを付ける（§6.3）。
+- iOS 版は触覚フィードバックを持つ（§12）。`accessibilityReduceMotion` のときはスピン中と順番決めの連続的な触覚を鳴らさず、開始と結果だけにする。
 
 ---
 
@@ -395,3 +396,4 @@ iOS 版には対応物が無い、または OS が代替する項目。
 | プリレンダ、SEO、sitemap、CSP、hreflang | 無し | Web 固有 |
 | ラベル 20 文字（UTF-16 単位） | 20 文字（`Character` 単位） | 絵文字等の結合文字で差が出る |
 | フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートの「著作権」項目 | 帰属の文（basekeita と Takumi Muraishi の連名）と `© 2026 basekeita, Takumi Muraishi` を載せる。設定の項目は現状これだけ（`SettingsView`） |
+| 触覚フィードバックは無し | スピン開始 `.impact(.medium)`、スピン中は針が境目を越えるたび `.selection`、停止・結果表示 `.success`。順番決めは行が 1 件現れるごと `.selection`、全件そろって `.success`。長押しで指定が切り替わった瞬間 `.impact(.light)` | iOS 17 の `sensoryFeedback(_:trigger:)`。回転は `withAnimation` で最終値まで一気に書き込まれ補間中の角度は observable でないため、開始角・終了角・`SPIN_EASING`（`CubicBezierCurve`）から境目を越える時刻の列を `HapticSchedule.boundaryCrossings` で先に求め、`Config.hapticMinInterval`（60ms）未満の間隔は間引いて `TickScheduler` の `Task` で順に刻む。終盤は減速に合わせて間隔が開く。スピンの完了・中断でタスクはキャンセル。`accessibilityReduceMotion` では境目の刻みと 1 件ごとの刻みを省き、開始と結果だけ鳴らす。設定シート先頭の「触覚フィードバック」スイッチで OFF にでき、`UserDefaults`（`hapticsEnabled`、未設定は ON）に保存する。文言はこの見出しだけで、長押しに触れる説明は置かない。長押しの触覚は本人の指にしか伝わらないので見た目には何も足さない。音は出さない |

@@ -32,4 +32,13 @@ enum Config {
 
     /// スピンの周回数の範囲。フリックの強さもこの範囲の中に写す。
     static let fullSpinRange: ClosedRange<Int> = 4...8
+
+    /// 盤面のフリックをスピンとみなす角速度（度/秒）の下限。これ未満では何もしない。
+    static let flickMinAngularVelocity: Double = 240
+
+    /// 周回数が上限に達する角速度（度/秒）。これ以上はすべて最大の周回数になる。
+    static let flickMaxAngularVelocity: Double = 1800
+
+    /// 盤面中心からこの半径（pt）の内側では角速度が発散するので、フリックとして扱わない。
+    static let flickDeadZoneRadius: Double = 24
 }

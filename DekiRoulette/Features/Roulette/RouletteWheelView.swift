@@ -2,9 +2,12 @@ import SwiftUI
 
 /// 盤面の描画。回転は親が `rotation` を書き換え、このビューは `rotationEffect` で受ける。
 /// 角度は 12 時を 0 度として時計回りに数える。針は 12 時に固定。
+///
+/// フリックは `onFlick` に角速度（度/秒、時計回りが正）で伝える。盤面は指に追従させない。
 struct RouletteWheelView: View {
     let items: [Item]
     let rotation: Double
+    var onFlick: ((Double) -> Void)? = nil
 
     private static let referenceSize: CGFloat = 320
     private static let ink = Theme.onSlice
@@ -24,6 +27,15 @@ struct RouletteWheelView: View {
                 .offset(y: -6)
         }
         .aspectRatio(1, contentMode: .fit)
+        .overlay {
+            // 指を離した瞬間の速さだけを見る。ドラッグ中に盤面を動かすと、止まった位置と結果の対応が
+            // ずれて見えるので追従はさせない
+            GeometryReader { proxy in
+                Color.clear
+                    .contentShape(Rectangle())
+                    .highPriorityGesture(flickGesture(center: CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2)))
+            }
+        }
         .accessibilityHidden(true)
     }
 
@@ -32,6 +44,14 @@ struct RouletteWheelView: View {
             .fill(Theme.flare)
             .frame(width: 22, height: 26)
             .shadow(color: Theme.pointerShadow, radius: 3, y: 3)
+    }
+
+    private func flickGesture(center: CGPoint) -> some Gesture {
+        DragGesture(minimumDistance: 8)
+            .onEnded { value in
+                let velocity = FlickSpin.angularVelocity(location: value.location, velocity: value.velocity, center: center)
+                onFlick?(velocity)
+            }
     }
 
     private func wheel(side: CGFloat) -> some View {

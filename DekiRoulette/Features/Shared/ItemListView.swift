@@ -17,6 +17,8 @@ struct ItemListView: View {
     @State private var pressingCount = 0
     @State private var hinting = false
     @State private var hintTask: Task<Void, Never>?
+    @State private var markToggleCount = 0
+    @AppStorage(Config.hapticsEnabledKey) private var hapticsEnabled = true
     @FocusState private var inputFocused: Bool
 
     private var trimmed: String { input.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -38,6 +40,10 @@ struct ItemListView: View {
             footnotes
         }
         .onDisappear { hintTask?.cancel() }
+        // 指定が切り替わった瞬間の軽い手応え。本人の指にしか伝わらないので見た目には何も足さない
+        .sensoryFeedback(trigger: markToggleCount) { _, _ in
+            hapticsEnabled ? .impact(weight: Config.hapticMarkToggleWeight) : nil
+        }
     }
 
     private var header: some View {
@@ -142,6 +148,7 @@ struct ItemListView: View {
 
     private func handleLongPress(_ id: UUID) {
         onLongPress(id)
+        markToggleCount += 1
         hinting = true
         hintTask?.cancel()
         hintTask = Task {

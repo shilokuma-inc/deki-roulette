@@ -4,6 +4,7 @@ struct OrderScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var model = OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems))
+    @AppStorage(Config.hapticsEnabledKey) private var hapticsEnabled = true
 
     // コピー済みかどうかは「どの結果をコピーしたか」から導く。
     @State private var copiedResultId: UUID?
@@ -40,6 +41,13 @@ struct OrderScreen: View {
             }
         }
         .onDisappear { copyTask?.cancel() }
+        // 触覚: 行が 1 件現れるごとの刻みと、全件そろった手応え。設定で OFF にできる
+        .sensoryFeedback(trigger: model.revealTick) { _, _ in
+            hapticsEnabled ? .selection : nil
+        }
+        .sensoryFeedback(trigger: model.revealing) { wasRevealing, revealing in
+            hapticsEnabled && wasRevealing && !revealing ? .success : nil
+        }
     }
 
     private var resultSection: some View {

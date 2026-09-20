@@ -14,7 +14,11 @@ final class OrderModel {
     /// 結果ごとに変わる識別子。結果の行を作り直して演出をやり直すために使う。
     private(set) var resultId = UUID()
 
+    /// 結果の行が現れた回数。1 件ごとに触覚を鳴らすトリガで、リセットしない。
+    private(set) var revealTick = 0
+
     private var revealTask: Task<Void, Never>?
+    private var tickTask: Task<Void, Never>?
 
     init(items: [Item]) {
         self.items = items
@@ -71,5 +75,10 @@ final class OrderModel {
             guard !Task.isCancelled else { return }
             self?.revealing = false
         }
+
+        // 行が現れる時刻は View のアニメーション遅延と同じ式で決まるので、同じ時刻に刻む
+        tickTask?.cancel()
+        let ticks = HapticSchedule.revealTicks(count: items.count, reducedMotion: reducedMotion)
+        tickTask = TickScheduler.run(at: ticks) { [weak self] in self?.revealTick += 1 }
     }
 }

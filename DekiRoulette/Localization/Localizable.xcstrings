@@ -55,6 +55,23 @@
         }
       }
     },
+    "close" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉じる"
+          }
+        }
+      }
+    },
     "copyright" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -680,6 +697,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ルーレット"
+          }
+        }
+      }
+    },
+    "settingsTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }

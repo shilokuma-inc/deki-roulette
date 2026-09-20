@@ -11,6 +11,7 @@ struct PageFrame<Content: View, Help: View>: View {
     @ViewBuilder let content: () -> Content
 
     @State private var helpOpen = false
+    @State private var settingsOpen = false
     @State private var useCasesOpen = false
     @State private var noticeOpen = false
 
@@ -30,6 +31,7 @@ struct PageFrame<Content: View, Help: View>: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .background(Theme.ink900.ignoresSafeArea())
+        .sheet(isPresented: $settingsOpen) { SettingsView() }
         // 開始した瞬間に畳む。人前で回すときに開きっぱなしを踏まないための保険
         .onChange(of: busy) { _, isBusy in
             if isBusy { helpOpen = false }
@@ -37,16 +39,36 @@ struct PageFrame<Content: View, Help: View>: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(title)
-                .font(.system(size: 34, weight: .black, design: .rounded))
-                .tracking(-1)
-                .foregroundStyle(Theme.ivory)
-                .accessibilityAddTraits(.isHeader)
-            Text(tagline)
-                .font(.subheadline)
-                .foregroundStyle(Theme.muted)
+        HStack(alignment: .top, spacing: 16) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(title)
+                    .font(.system(size: 34, weight: .black, design: .rounded))
+                    .tracking(-1)
+                    .foregroundStyle(Theme.ivory)
+                    .accessibilityAddTraits(.isHeader)
+                Text(tagline)
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.muted)
+            }
+            Spacer(minLength: 0)
+            settingsButton
         }
+    }
+
+    private var settingsButton: some View {
+        Button {
+            settingsOpen = true
+        } label: {
+            Image(systemName: "gearshape")
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(Theme.muted)
+                .frame(width: 40, height: 40)
+                .background(Circle().fill(Theme.ink800))
+                .overlay(Circle().strokeBorder(Theme.ink700))
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(L10n.settingsTitle)
     }
 
     private var footer: some View {
@@ -62,11 +84,6 @@ struct PageFrame<Content: View, Help: View>: View {
             FooterDisclosure(title: L10n.noticeTitle, isExpanded: $noticeOpen) {
                 Text(L10n.notice)
             }
-
-            Text(L10n.copyright)
-                .font(.caption)
-                .foregroundStyle(Theme.muted)
-                .padding(.top, 20)
         }
         .font(.subheadline)
         .foregroundStyle(Theme.muted)

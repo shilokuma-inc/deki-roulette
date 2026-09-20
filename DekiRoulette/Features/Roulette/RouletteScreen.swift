@@ -42,8 +42,14 @@ struct RouletteScreen: View {
 
     private var wheelSection: some View {
         VStack(spacing: 24) {
-            RouletteWheelView(items: model.items, rotation: model.rotation, onFlick: flick)
-                .frame(maxWidth: 320)
+            RouletteWheelView(
+                items: model.items,
+                rotation: model.rotation,
+                // 結果が出ている間だけ止まったスライスを強調する。項目を触って結果が消えれば強調も解ける
+                highlightedIndex: model.outcome?.index,
+                onFlick: flick
+            )
+            .frame(maxWidth: 320)
 
             resultStatus
                 .frame(height: 56)

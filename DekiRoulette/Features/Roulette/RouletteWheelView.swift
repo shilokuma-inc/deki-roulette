@@ -7,7 +7,7 @@ struct RouletteWheelView: View {
     let rotation: Double
 
     private static let referenceSize: CGFloat = 320
-    private static let ink = Theme.ink900
+    private static let ink = Theme.onSlice
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -18,7 +18,7 @@ struct RouletteWheelView: View {
                     .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
             }
             .rotationEffect(.degrees(rotation))
-            .shadow(color: .black.opacity(0.5), radius: 15, y: 10)
+            .shadow(color: Theme.wheelShadow, radius: 15, y: 10)
 
             pointer
                 .offset(y: -6)
@@ -31,7 +31,7 @@ struct RouletteWheelView: View {
         Triangle()
             .fill(Theme.flare)
             .frame(width: 22, height: 26)
-            .shadow(color: .black.opacity(0.55), radius: 3, y: 3)
+            .shadow(color: Theme.pointerShadow, radius: 3, y: 3)
     }
 
     private func wheel(side: CGFloat) -> some View {
@@ -44,13 +44,13 @@ struct RouletteWheelView: View {
         let fontSize = (count > 8 ? 9.0 : count > 5 ? 11.0 : 13.0) * scale
 
         return ZStack {
-            Circle().fill(Theme.ink700)
+            Circle().fill(Theme.wheelRim)
                 .frame(width: (radius + 11 * scale) * 2, height: (radius + 11 * scale) * 2)
-            Circle().strokeBorder(Theme.ink500, lineWidth: 1.5 * scale)
+            Circle().strokeBorder(Theme.wheelEdge, lineWidth: 1.5 * scale)
                 .frame(width: (radius + 5 * scale) * 2, height: (radius + 5 * scale) * 2)
 
             if count == 0 {
-                Circle().fill(Theme.ink700).frame(width: radius * 2, height: radius * 2)
+                Circle().fill(Theme.wheelRim).frame(width: radius * 2, height: radius * 2)
             } else if count == 1 {
                 Circle().fill(Theme.sliceColor(at: 0)).frame(width: radius * 2, height: radius * 2)
                 Text(truncate(items[0].label, max: maxLabelLength))
@@ -80,10 +80,10 @@ struct RouletteWheelView: View {
                 }
             }
 
-            Circle().fill(Theme.ink800)
-                .overlay(Circle().strokeBorder(Theme.ivory, lineWidth: 2.5 * scale))
+            Circle().fill(Theme.wheelHub)
+                .overlay(Circle().strokeBorder(Theme.wheelHubMark, lineWidth: 2.5 * scale))
                 .frame(width: 38 * scale, height: 38 * scale)
-            Circle().fill(Theme.ivory).frame(width: 12 * scale, height: 12 * scale)
+            Circle().fill(Theme.wheelHubMark).frame(width: 12 * scale, height: 12 * scale)
         }
         .frame(width: side, height: side)
     }

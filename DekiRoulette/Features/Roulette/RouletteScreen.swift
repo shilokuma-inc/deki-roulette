@@ -62,7 +62,7 @@ struct RouletteScreen: View {
     private var resultStatus: some View {
         if let outcome = model.outcome {
             // 止まったスライスと同じ色で出す
-            let color = Theme.sliceColor(at: outcome.index)
+            let color = Theme.sliceAccent(at: outcome.index)
             Text(outcome.label)
                 .font(.title3.weight(.black))
                 .foregroundStyle(color)

@@ -386,6 +386,7 @@ iOS 版には対応物が無い、または OS が代替する項目。
 | `aria-pressed` / sr-only の先頭・末尾 | `.isSelected` トレイトと `accessibilityValue` | 伏せている間は付けない（同じ） |
 | CSS トランジション + `transitionend` + 5.1 秒の保険 | `withAnimation(completion:)` + 5.1 秒の保険 `Task` | 同じ回転角の式（`RouletteMath`） |
 | ルーレットの結果表示は `gold` の枠（§5.3） | 針が止まったスライスと同じ色の枠 | 盤面のどこで止まったかを結果からも読み取れるようにする。結果はラベルと盤面上の添字を `SpinOutcome` で持ち、添字から `SLICE_COLORS` を引く。`gold` は順番決めの 1 位とフォーカスリングに残る |
+| 常に dark、ライトテーマは無い（§9.3） | 端末の外観設定に従う（アプリ内の切替は持たない） | `Theme` の各トークンがライト／ダークの 2 値を持つ。盤面（スライスの塗り・区切り線・縁・ハブ）と開始ボタンの塗りは、明るい色の上に暗い文字という前提が崩れるため外観に依らず固定。スライス色を文字や色見本に使うところは、ライトでは同じ色相の暗い版（`sliceAccent(at:)`）に差し替える |
 | `prefers-reduced-motion` | `accessibilityReduceMotion` 環境値 | 同じ時間定数 |
 | `crypto.getRandomValues` + 剰余の偏り除去 | `SystemRandomNumberGenerator` | Apple の実装は暗号学的に安全で、`Int.random(in:)` は偏りを除去済み |
 | `navigator.clipboard.writeText` | `UIPasteboard.general.string` | 書式は同じ |

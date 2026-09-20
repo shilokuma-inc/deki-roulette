@@ -66,6 +66,5 @@ private struct SettingsSection<Content: View>: View {
 
 #Preview {
     SettingsView()
-        .preferredColorScheme(.dark)
         .fontDesign(.rounded)
 }

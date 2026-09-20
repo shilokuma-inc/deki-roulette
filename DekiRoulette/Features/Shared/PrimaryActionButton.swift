@@ -12,11 +12,11 @@ struct PrimaryActionButton: View {
             Text(title)
                 .font(.title3.weight(.black))
                 .tracking(0.5)
-                .foregroundStyle(enabled ? Theme.ink900 : Theme.muted)
+                .foregroundStyle(enabled ? Theme.onFlare : Theme.muted)
                 .padding(.horizontal, 48)
                 .padding(.vertical, 14)
                 .background(enabled ? Theme.flare : Theme.ink700, in: .capsule)
-                .shadow(color: enabled ? Theme.flare.opacity(0.45) : .clear, radius: 14, y: 8)
+                .shadow(color: enabled ? Theme.flareGlow : .clear, radius: 14, y: 8)
         }
         .buttonStyle(PressScaleStyle())
         .disabled(!enabled)

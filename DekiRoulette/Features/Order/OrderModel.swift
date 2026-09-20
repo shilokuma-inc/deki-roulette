@@ -16,8 +16,18 @@ final class OrderModel {
 
     private var revealTask: Task<Void, Never>?
 
+    /// 項目の保存先。nil のときは保存しない（プレビューやテスト向け）。
+    private let store: ItemStore?
+
     init(items: [Item]) {
         self.items = items
+        store = nil
+    }
+
+    /// 保存済みの項目から始める。無ければ初期項目。
+    init(store: ItemStore) {
+        self.store = store
+        items = store.load()
     }
 
     var canShuffle: Bool { !revealing && items.count >= Config.minItems }
@@ -35,6 +45,7 @@ final class OrderModel {
         guard !label.isEmpty, !atCapacity else { return }
         items.append(Item(label: label))
         ordered = nil
+        persist()
     }
 
     func removeItem(id: UUID) {
@@ -42,6 +53,27 @@ final class OrderModel {
         if firstId == id { firstId = nil }
         if lastId == id { lastId = nil }
         ordered = nil
+        persist()
+    }
+
+    /// 項目を丸ごと入れ替える。指定と結果は前のリストのものなので捨てる。
+    func replaceItems(_ next: [Item]) {
+        items = next
+        firstId = nil
+        lastId = nil
+        ordered = nil
+        persist()
+    }
+
+    /// 項目を初期状態に戻す。保存データも消すので、以降は言語設定に応じた初期項目に追従する。
+    func resetItems() {
+        guard let store else { return }
+        replaceItems(store.defaultItems)
+        store.clear()
+    }
+
+    private func persist() {
+        store?.save(items)
     }
 
     /// 長押しのたびに 先頭 → 末尾 → 解除 と回す。

@@ -380,7 +380,7 @@ iOS 版には対応物が無い、または OS が代替する項目。
 |---|---|---|
 | `/` と `/order/` の 2 ページ | `TabView` の 2 タブ（ルーレット / 順番決め） | 項目や指定はタブ間で共有しない（同じ） |
 | 言語別 URL、言語切替、誘導リンク | OS の言語設定に従う（設定アプリの「アプリごとの言語」も有効） | アプリ内の言語切替は持たない |
-| `<title>` / `<h1>` の書き分け | 日本語の表示名「デキレーレット」、英語の表示名「Roulette」 | `InfoPlist.xcstrings` |
+| `<title>` / `<h1>` の書き分け | 日本語の表示名「デキレーレット」、英語の表示名「DekiRoulette」 | Web 版の英語は一般語「Roulette」だが、iOS 版は英語もブランド名を出す。アプリ名は `InfoPlist.xcstrings`、ヘッダの見出しは `Localizable.xcstrings` の `title`。タブ・ナビのラベル（`rouletteNavLabel`）とタグラインは一般語のまま |
 | 長押し 600ms（ポインタ）／ キーリピート（キーボード） | `onLongPressGesture(minimumDuration: 0.6)` | VoiceOver は「ダブルタップして押し続ける」でジェスチャを通せる |
 | 印を出す条件: ポインタ／フォーカスがリスト上、または指定直後 1.6 秒 | 行を押している間、または指定直後 1.6 秒 | タッチにはホバーが無いため「押している間」に置き換え |
 | `aria-pressed` / sr-only の先頭・末尾 | `.isSelected` トレイトと `accessibilityValue` | 伏せている間は付けない（同じ） |

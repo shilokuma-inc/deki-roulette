@@ -395,3 +395,4 @@ iOS 版には対応物が無い、または OS が代替する項目。
 | プリレンダ、SEO、sitemap、CSP、hreflang | 無し | Web 固有 |
 | ラベル 20 文字（UTF-16 単位） | 20 文字（`Character` 単位） | 絵文字等の結合文字で差が出る |
 | フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートの「著作権」項目 | 帰属の文（basekeita と Takumi Muraishi の連名）と `© 2026 basekeita, Takumi Muraishi` を載せる。設定の項目は現状これだけ（`SettingsView`） |
+| ローンチ画面は無い | `UILaunchScreen` の `UIColorName` に無地の `LaunchBackground`（Color Set） | ライト `#FAF7F2` / ダーク `#17111F` で `ink900` と同じ 2 値。ロゴやアプリ名は置かない。`ink900` を変えるときは Color Set も合わせる |

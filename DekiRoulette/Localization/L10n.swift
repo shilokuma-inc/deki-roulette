@@ -49,6 +49,8 @@ enum L10n {
     static var settingsTitle: String { tr("settingsTitle") }
     static var close: String { tr("close") }
     static var copyright: String { tr("copyright") }
+    static var copyrightTitle: String { tr("copyrightTitle") }
+    static var copyrightOwner: String { tr("copyrightOwner") }
 
     static var defaultItems: [String] { lines("defaultItems") }
     static var orderDefaultItems: [String] { lines("orderDefaultItems") }

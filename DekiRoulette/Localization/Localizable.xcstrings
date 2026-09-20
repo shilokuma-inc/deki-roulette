@@ -89,6 +89,40 @@
         }
       }
     },
+    "copyrightOwner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The copyright of this app belongs to basekeita."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本アプリの著作権は basekeita に帰属します。"
+          }
+        }
+      }
+    },
+    "copyrightTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "著作権"
+          }
+        }
+      }
+    },
     "defaultItems" : {
       "extractionState" : "manual",
       "localizations" : {

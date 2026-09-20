@@ -34,7 +34,8 @@ struct OrderScreen: View {
                     atCapacity: model.atCapacity,
                     onAdd: { model.addItem($0) },
                     onRemove: { model.removeItem(id: $0) },
-                    onLongPress: { model.cycleMark(id: $0) }
+                    onLongPress: { model.cycleMark(id: $0) },
+                    onLoad: { model.replaceItems($0) }
                 )
                 .frame(maxWidth: sizeClass == .regular ? 320 : .infinity)
             }
@@ -94,4 +95,5 @@ struct OrderScreen: View {
 
 #Preview {
     OrderScreen(model: OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems)))
+        .environment(SavedListsModel(lists: []))
 }

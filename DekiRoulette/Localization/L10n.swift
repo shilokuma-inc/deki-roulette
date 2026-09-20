@@ -36,8 +36,6 @@ enum L10n {
     static var orderResultPlaceholder: String { tr("orderResultPlaceholder") }
     static var orderResultTitle: String { tr("orderResultTitle") }
     static func orderRankAccessibilityLabel(_ rank: Int) -> String { fmt("orderRankAccessibilityLabel", rank) }
-    static var orderCopy: String { tr("orderCopy") }
-    static var orderCopied: String { tr("orderCopied") }
     static var orderMarkFirst: String { tr("orderMarkFirst") }
     static var orderMarkLast: String { tr("orderMarkLast") }
     static var orderHelpBasic: String { tr("orderHelpBasic") }
@@ -51,6 +49,11 @@ enum L10n {
     static var copyright: String { tr("copyright") }
     static var copyrightTitle: String { tr("copyrightTitle") }
     static var copyrightOwner: String { tr("copyrightOwner") }
+    static var copyResult: String { tr("copyResult") }
+    static var copied: String { tr("copied") }
+    static var share: String { tr("share") }
+    static var resultHeading: String { tr("resultHeading") }
+    static var appName: String { tr("appName") }
 
     static var defaultItems: [String] { lines("defaultItems") }
     static var orderDefaultItems: [String] { lines("orderDefaultItems") }

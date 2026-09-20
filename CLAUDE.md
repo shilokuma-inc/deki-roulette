@@ -23,13 +23,14 @@ iOS 固有の差分は SPEC.md の「iOS 版との対応」に追記する。
 - モデル (`RouletteModel` / `OrderModel`) は `@MainActor` で、View は薄く保つ。
 - ロジックは `Core/` の純粋関数に寄せ、乱数は `RandomNumberGenerator` を注入できるようにしてテストする（テストは Swift Testing）。
 - 文言は `Localizable.xcstrings` にだけ置き、`L10n` 経由で読む。表示言語は OS 設定に従い、アプリ内切替は持たない。
-- 配色・アニメーションは `Theme` に集約。`gold` は結果表示（順番決めは 1 位）専用、`flare` は開始ボタン専用。印に専用色は使わない。
+- 配色・アニメーションは `Theme` に集約。`gold` は順番決めの 1 位とフォーカスリング専用（ルーレットの結果表示は止まったスライスと同じ色）、`flare` は開始ボタン専用。印に専用色は使わない。
 
 ### スピンの仕組み
 
 `RouletteModel.beginSpin` が `RouletteMath.nextRotation` で累積回転角を決めて返し、View が
 `withAnimation(Theme.spinAnimation) { model.rotation = next } completion: { model.finishSpin() }` で回す。
-結果は開始時に確定している。完了コールバックが来ない場合の保険として `Config.spinFallback` のタイマーを持つ。
+結果は開始時に確定している（`SpinOutcome` でラベルと盤面上の添字を持ち、結果表示の色を止まったスライスに合わせる）。
+完了コールバックが来ない場合の保険として `Config.spinFallback` のタイマーを持つ。
 `accessibilityReduceMotion` のときは回さず、`reducedMotionSpinDuration` 後に完了扱いにする。
 
 盤面は 12 時を 0 度、時計回り。`SliceShape` は `clockwise: false` で画面上は時計回りになる（y 軸が下向きのため）。

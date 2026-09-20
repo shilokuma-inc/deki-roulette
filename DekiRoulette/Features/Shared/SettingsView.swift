@@ -1,13 +1,17 @@
 import SwiftUI
 
-/// ヘッダ右上のアイコンから開く設定。いまは著作権の項目だけを置く。
+/// ヘッダ右上のアイコンから開く設定。触覚フィードバックの切替と著作権の項目を置く。
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(Config.hapticsEnabledKey) private var hapticsEnabled = true
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    // 文言はこの見出しだけ。何に使うかの説明は置かない（長押しの存在を示唆しないため）
+                    SettingsToggle(title: L10n.hapticsTitle, isOn: $hapticsEnabled)
+
                     SettingsSection(title: L10n.copyrightTitle) {
                         Text(L10n.copyrightOwner)
                             .font(.subheadline)
@@ -33,6 +37,27 @@ struct SettingsView: View {
             }
             .toolbarBackground(Theme.ink800, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+        }
+    }
+}
+
+/// 設定の ON/OFF 1 項目。枠の中に見出しとスイッチを並べる。
+private struct SettingsToggle: View {
+    let title: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            Text(title)
+                .font(.callout.weight(.bold))
+                .foregroundStyle(Theme.ivory)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 12)
+        .background(Theme.ink800, in: .rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Theme.ink700, lineWidth: 1)
         }
     }
 }

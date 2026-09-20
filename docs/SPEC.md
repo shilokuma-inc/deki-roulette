@@ -392,3 +392,4 @@ iOS 版には対応物が無い、または OS が代替する項目。
 | `aria-live` の結果通知 | `AccessibilityNotification.Announcement` | |
 | プリレンダ、SEO、sitemap、CSP、hreflang | 無し | Web 固有 |
 | ラベル 20 文字（UTF-16 単位） | 20 文字（`Character` 単位） | 絵文字等の結合文字で差が出る |
+| フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートに表示 | 設定シートの中身は現状この表示だけ（`SettingsView`） |

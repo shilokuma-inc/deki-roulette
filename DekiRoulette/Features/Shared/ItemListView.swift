@@ -108,7 +108,7 @@ struct ItemListView: View {
                 let mark = marks[item.id]
                 ItemRow(
                     item: item,
-                    color: Theme.sliceColor(at: index),
+                    color: Theme.sliceAccent(at: index),
                     mark: mark,
                     showMark: revealMarks && mark != nil,
                     busy: busy,
@@ -125,7 +125,7 @@ struct ItemListView: View {
         if items.count < Config.minItems {
             Text(L10n.needMoreItems)
                 .font(.caption)
-                .foregroundStyle(Theme.flare)
+                .foregroundStyle(Theme.flareText)
         }
         if atCapacity {
             Text(L10n.atCapacity(Config.maxItems))

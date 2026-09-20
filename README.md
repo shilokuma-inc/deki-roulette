@@ -33,7 +33,7 @@ GitHub Actions（`.github/workflows/`）。どのワークフローも最初に 
 | `APPLE_API_ISSUER_ID` | 同キーの Issuer ID |
 
 署名もアップロードもこの API キーで行う。Upload が通るには、App Store Connect に Bundle ID
-`ml.mrs1669.DekiRoulette` のアプリがあらかじめ登録されている必要がある。
+`com.basekeita.roulette` のアプリがあらかじめ登録されている必要がある。
 
 ## 環境
 

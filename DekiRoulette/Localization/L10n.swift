@@ -51,6 +51,11 @@ enum L10n {
     static var copyright: String { tr("copyright") }
     static var copyrightTitle: String { tr("copyrightTitle") }
     static var copyrightOwner: String { tr("copyrightOwner") }
+    static var removeAll: String { tr("removeAll") }
+    static var removeAllConfirmTitle: String { tr("removeAllConfirmTitle") }
+    static var cancel: String { tr("cancel") }
+    static func removedToast(_ label: String) -> String { fmt("removedToast", label) }
+    static var undo: String { tr("undo") }
 
     static var defaultItems: [String] { lines("defaultItems") }
     static var orderDefaultItems: [String] { lines("orderDefaultItems") }

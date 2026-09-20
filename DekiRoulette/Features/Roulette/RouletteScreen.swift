@@ -28,6 +28,8 @@ struct RouletteScreen: View {
                     atCapacity: model.atCapacity,
                     onAdd: { model.addItem($0) },
                     onRemove: { model.removeItem(id: $0) },
+                    onRemoveAll: { model.removeAll() },
+                    onRestore: { model.restore($0, at: $1) },
                     onLongPress: { model.toggleTarget(id: $0) }
                 )
                 .frame(maxWidth: sizeClass == .regular ? 320 : .infinity)

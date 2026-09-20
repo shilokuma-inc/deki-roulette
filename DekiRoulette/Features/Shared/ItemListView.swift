@@ -10,10 +10,17 @@ struct ItemListView: View {
     let concealMarks: Bool
     let atCapacity: Bool
     let onAdd: (String) -> Void
-    let onRemove: (UUID) -> Void
+    /// 削除した項目と元の位置を返す。「元に戻す」で `onRestore` に渡す。
+    let onRemove: (UUID) -> RemovedItem?
+    let onRemoveAll: () -> Void
+    let onRestore: (Item, Int) -> Void
     let onLongPress: (UUID) -> Void
 
     @State private var input = ""
+    @State private var confirmingRemoveAll = false
+    /// 直前に「✕」で削除した項目。トーストを出している間だけ持ち、期限が来ると確定する。
+    @State private var pendingRemoval: RemovedItem?
+    @State private var undoTask: Task<Void, Never>?
     @State private var pressingCount = 0
     @State private var hinting = false
     @State private var hintTask: Task<Void, Never>?
@@ -35,9 +42,26 @@ struct ItemListView: View {
             } else {
                 rows
             }
+            if let pendingRemoval {
+                undoToast(for: pendingRemoval)
+            }
             footnotes
         }
-        .onDisappear { hintTask?.cancel() }
+        .onDisappear {
+            hintTask?.cancel()
+            undoTask?.cancel()
+        }
+        // スピン／並べ替えを始めたら取り消せなくする。結果と項目リストの整合を保つため
+        .onChange(of: busy) { _, isBusy in
+            if isBusy { dismissUndo() }
+        }
+        .confirmationDialog(L10n.removeAllConfirmTitle, isPresented: $confirmingRemoveAll, titleVisibility: .visible) {
+            Button(L10n.removeAll, role: .destructive) {
+                dismissUndo()
+                onRemoveAll()
+            }
+            Button(L10n.cancel, role: .cancel) {}
+        }
     }
 
     private var header: some View {
@@ -46,6 +70,13 @@ struct ItemListView: View {
                 .font(.callout.weight(.bold))
                 .foregroundStyle(Theme.ivory)
             Spacer()
+            if !items.isEmpty && !busy {
+                Button(L10n.removeAll) { confirmingRemoveAll = true }
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Theme.muted)
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 4)
+            }
             Text(L10n.itemCount(items.count, Config.maxItems))
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(Theme.muted)
@@ -103,7 +134,9 @@ struct ItemListView: View {
     }
 
     private var rows: some View {
-        LazyVStack(spacing: 6) {
+        // LazyVStack だと末尾の行を消したときに直後のトースト（`undoToast`）が配置されないため
+        // 通常の VStack にしている。行は最大 24 なので遅延生成は要らない
+        VStack(spacing: 6) {
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                 let mark = marks[item.id]
                 ItemRow(
@@ -114,10 +147,33 @@ struct ItemListView: View {
                     busy: busy,
                     onPressingChanged: { pressing in pressingCount += pressing ? 1 : -1 },
                     onLongPress: { handleLongPress(item.id) },
-                    onRemove: { onRemove(item.id) }
+                    onRemove: { handleRemove(item.id) }
                 )
             }
         }
+    }
+
+    /// 「✕」で削除した直後に出す、元に戻すための帯。
+    private func undoToast(for removed: RemovedItem) -> some View {
+        HStack(spacing: 12) {
+            Text(L10n.removedToast(removed.item.label))
+                .font(.caption)
+                .foregroundStyle(Theme.muted)
+                .lineLimit(1)
+                .truncationMode(.middle)
+            Spacer(minLength: 0)
+            Button(L10n.undo) { restorePending() }
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Theme.ivory)
+                .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(Theme.ink800, in: .rect(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Theme.ink600, lineWidth: 1))
+        // 削除のたびに作り直し、置き換えでも新しく現れたように見せる
+        .id(removed.item.id)
+        .transition(.opacity)
     }
 
     @ViewBuilder
@@ -138,6 +194,31 @@ struct ItemListView: View {
         guard !trimmed.isEmpty, !inputDisabled else { return }
         onAdd(trimmed)
         input = ""
+    }
+
+    private func handleRemove(_ id: UUID) {
+        guard let removed = onRemove(id) else { return }
+        // 直前の削除が残っていればそれは確定し、新しい削除に置き換える（多段 Undo は持たない）
+        withAnimation(Theme.undoToastAnimation) { pendingRemoval = removed }
+        AccessibilityNotification.Announcement(L10n.removedToast(removed.item.label)).post()
+        undoTask?.cancel()
+        undoTask = Task {
+            try? await Task.sleep(for: .seconds(Config.undoDuration))
+            guard !Task.isCancelled else { return }
+            withAnimation(Theme.undoToastAnimation) { pendingRemoval = nil }
+        }
+    }
+
+    private func restorePending() {
+        guard let pendingRemoval else { return }
+        dismissUndo()
+        onRestore(pendingRemoval.item, pendingRemoval.index)
+    }
+
+    private func dismissUndo() {
+        undoTask?.cancel()
+        undoTask = nil
+        withAnimation(Theme.undoToastAnimation) { pendingRemoval = nil }
     }
 
     private func handleLongPress(_ id: UUID) {
@@ -215,7 +296,9 @@ private struct ItemRow: View {
         concealMarks: false,
         atCapacity: false,
         onAdd: { _ in },
-        onRemove: { _ in },
+        onRemove: { _ in nil },
+        onRemoveAll: {},
+        onRestore: { _, _ in },
         onLongPress: { _ in }
     )
     .padding()
@@ -230,7 +313,9 @@ private struct ItemRow: View {
         concealMarks: false,
         atCapacity: false,
         onAdd: { _ in },
-        onRemove: { _ in },
+        onRemove: { _ in nil },
+        onRemoveAll: {},
+        onRestore: { _, _ in },
         onLongPress: { _ in }
     )
     .padding()

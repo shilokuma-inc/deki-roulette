@@ -29,4 +29,7 @@ enum Config {
 
     /// コピーできたことを伝える表示を出しておく時間。
     static let copyFeedbackDuration: TimeInterval = 1.8
+
+    /// 削除した項目を「元に戻す」で戻せる時間。過ぎると削除が確定する。
+    static let undoDuration: TimeInterval = 5
 }

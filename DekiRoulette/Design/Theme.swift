@@ -90,6 +90,9 @@ enum Theme {
 
     /// 結果が現れる演出。両画面で使い回す。
     static let revealAnimation = Animation.timingCurve(0.2, 0.9, 0.3, 1, duration: Config.revealAnimationDuration)
+
+    /// 削除を元に戻すトーストの出入り。
+    static let undoToastAnimation = Animation.easeOut(duration: 0.2)
 }
 
 extension Color {

@@ -29,4 +29,9 @@ enum Config {
 
     /// コピーできたことを伝える表示を出しておく時間。
     static let copyFeedbackDuration: TimeInterval = 1.8
+
+    /// 名前を付けて保存できる項目リストの数。
+    static let maxSavedLists = 20
+    /// 保存するリストの名前の最大文字数（正規化後）。
+    static let maxSavedListNameLength = 30
 }

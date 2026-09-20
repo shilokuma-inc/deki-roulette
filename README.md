@@ -6,6 +6,33 @@
 機能仕様は [`docs/SPEC.md`](docs/SPEC.md) が正。Web 版（React + Vite）から移植したもので、
 プラットフォーム差分は同書の「iOS 版との対応」にまとめてある。Web 版のコードは b7b3936 以前の履歴にある。
 
+## Status
+
+| branch \ workflow | Build | Archive | Upload |
+|---|---|---|---|
+| main | [![Build](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/build.yml?query=branch%3Amain) | [![Archive](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/archive.yml/badge.svg?branch=main)](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/archive.yml?query=branch%3Amain) | — |
+| develop | [![Build](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/build.yml?query=branch%3Adevelop) | [![Archive](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/archive.yml/badge.svg?branch=develop)](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/archive.yml?query=branch%3Adevelop) | [![Upload](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/upload.yml/badge.svg?branch=develop)](https://github.com/shilokuma-inc/deki-roulette/actions/workflows/upload.yml?query=branch%3Adevelop) |
+
+## CI
+
+GitHub Actions（`.github/workflows/`）。どのワークフローも最初に `xcodegen generate` で `.xcodeproj` を生成する。
+
+| ワークフロー | トリガー | 内容 |
+|---|---|---|
+| Build | 全ブランチへの push と PR | シミュレータでビルドしてユニットテストを実行 |
+| Archive | 全ブランチへの push | Release 構成でアーカイブし、App Store Connect API キーで署名して IPA を書き出す |
+| Upload | main 以外への push | Archive に加えて TestFlight へアップロードし、IPA を Artifacts に残す |
+
+ビルド番号 (`CFBundleVersion`) はワークフローの `run_number` で上書きする。Archive / Upload には次の Secrets が必要:
+
+| Secret | 内容 |
+|---|---|
+| `EXPORT_OPTIONS` | `ExportOptions.plist` の中身 |
+| `APPLE_API_KEY_BASE64` | App Store Connect API キー (`.p8`) を base64 にしたもの |
+| `APPLE_API_KEY_ID` | 同キーの Key ID |
+| `APPLE_API_ISSUER_ID` | 同キーの Issuer ID |
+| `APPLE_ID` / `APP_SPECIFIC_PASSWORD` | `altool` でのアップロードに使う Apple ID とアプリ用パスワード（Upload のみ） |
+
 ## 環境
 
 - Xcode 27 / iOS 17.0 以上

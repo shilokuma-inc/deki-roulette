@@ -18,6 +18,9 @@ struct ItemListView: View {
     @State private var hinting = false
     @State private var hintTask: Task<Void, Never>?
     @FocusState private var inputFocused: Bool
+    /// 入力欄を横並びにするために最低限確保したい幅。文字と同じ比率で伸ばし、
+    /// 大きい文字や狭い画面で足りなければ `ViewThatFits` が縦積みに切り替える。
+    @ScaledMetric(relativeTo: .subheadline) private var inputMinWidth: CGFloat = 160
 
     private var trimmed: String { input.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var inputDisabled: Bool { busy || atCapacity }
@@ -53,40 +56,56 @@ struct ItemListView: View {
     }
 
     private var addForm: some View {
-        HStack(spacing: 8) {
-            TextField(L10n.addPlaceholder, text: $input)
-                .textFieldStyle(.plain)
-                .focused($inputFocused)
-                .submitLabel(.done)
-                .onSubmit(handleAdd)
-                .onChange(of: input) { _, newValue in
-                    if newValue.count > Config.maxLabelLength {
-                        input = String(newValue.prefix(Config.maxLabelLength))
-                    }
-                }
-                .disabled(inputDisabled)
-                .font(.subheadline)
-                .foregroundStyle(Theme.ivory)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(Theme.ink800, in: .rect(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .strokeBorder(inputFocused ? Theme.ink400 : Theme.ink600, lineWidth: 1)
-                )
-                .opacity(inputDisabled ? 0.4 : 1)
-
-            Button(action: handleAdd) {
-                Text(L10n.addButton)
-                    .font(.subheadline.weight(.bold))
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
+        // 入力欄に `inputMinWidth` を確保できる間は横並び、できなければ縦積みにする。
+        // 横並び側の入力欄は伸縮するので、最小幅を明示しないと常に「収まる」と判定されてしまう。
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                inputField
+                    .frame(minWidth: inputMinWidth)
+                addButton
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(inputDisabled || trimmed.isEmpty ? Theme.muted.opacity(0.6) : Theme.ivory)
-            .background(inputDisabled || trimmed.isEmpty ? Theme.ink800 : Theme.ink700, in: .rect(cornerRadius: 12))
-            .disabled(inputDisabled || trimmed.isEmpty)
+            VStack(alignment: .leading, spacing: 8) {
+                inputField
+                addButton
+            }
         }
+    }
+
+    private var inputField: some View {
+        TextField(L10n.addPlaceholder, text: $input)
+            .textFieldStyle(.plain)
+            .focused($inputFocused)
+            .submitLabel(.done)
+            .onSubmit(handleAdd)
+            .onChange(of: input) { _, newValue in
+                if newValue.count > Config.maxLabelLength {
+                    input = String(newValue.prefix(Config.maxLabelLength))
+                }
+            }
+            .disabled(inputDisabled)
+            .font(.subheadline)
+            .foregroundStyle(Theme.ivory)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Theme.ink800, in: .rect(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(inputFocused ? Theme.ink400 : Theme.ink600, lineWidth: 1)
+            )
+            .opacity(inputDisabled ? 0.4 : 1)
+    }
+
+    private var addButton: some View {
+        Button(action: handleAdd) {
+            Text(L10n.addButton)
+                .font(.subheadline.weight(.bold))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(inputDisabled || trimmed.isEmpty ? Theme.muted.opacity(0.6) : Theme.ivory)
+        .background(inputDisabled || trimmed.isEmpty ? Theme.ink800 : Theme.ink700, in: .rect(cornerRadius: 12))
+        .disabled(inputDisabled || trimmed.isEmpty)
     }
 
     private var emptyState: some View {
@@ -162,6 +181,8 @@ private struct ItemRow: View {
     let onLongPress: () -> Void
     let onRemove: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
         HStack(spacing: 0) {
             HStack(spacing: 10) {
@@ -169,7 +190,7 @@ private struct ItemRow: View {
                 Text(item.label)
                     .font(.subheadline)
                     .foregroundStyle(Theme.ivory)
-                    .lineLimit(1)
+                    .lineLimit(TypeLayout.labelLineLimit(for: typeSize))
                     .truncationMode(.tail)
                 Spacer(minLength: 0)
             }
@@ -188,16 +209,17 @@ private struct ItemRow: View {
             .accessibilityAddTraits(showMark ? .isSelected : [])
             .accessibilityValue(showMark ? (mark.flatMap(L10n.markLabel) ?? "") : "")
 
+            // アイコンの大きさと中心位置は従来（32×40 + 右余白 6）のまま、押せる範囲だけ 44×44 に広げる
             Button(action: onRemove) {
                 Image(systemName: "xmark")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(Theme.ink400)
-                    .frame(width: 32, height: 40)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .disabled(busy)
             .accessibilityLabel(L10n.removeAccessibilityLabel(item.label))
-            .padding(.trailing, 6)
         }
         .background(Theme.ink800, in: .rect(cornerRadius: 12))
         .overlay(
@@ -220,6 +242,22 @@ private struct ItemRow: View {
     )
     .padding()
     .background(Theme.ink900)
+}
+
+#Preview("Marks visible AX5") {
+    ItemListView(
+        items: ItemLabel.makeItems(["ラーメン", "カレー", "寿司", "焼肉"]),
+        marks: [:],
+        busy: false,
+        concealMarks: false,
+        atCapacity: false,
+        onAdd: { _ in },
+        onRemove: { _ in },
+        onLongPress: { _ in }
+    )
+    .padding()
+    .background(Theme.ink900)
+    .dynamicTypeSize(.accessibility5)
 }
 
 #Preview("Empty") {

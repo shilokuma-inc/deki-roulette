@@ -32,4 +32,15 @@ enum Config {
 
     /// スピンのイージング（Web 版 `SPIN_EASING`）。`Theme.spinAnimation` と、クリック音の時刻の逆算の両方で使う。
     static let spinEasing = CubicBezierCurve(0.15, 0.85, 0.3, 1)
+
+    // MARK: 効果音
+
+    /// 効果音の ON/OFF を保存する `UserDefaults` のキー。未設定なら ON。
+    static let soundEnabledKey = "soundEnabled"
+
+    /// スピン中にクリック音を鳴らす最短間隔。序盤は境目を越える間隔がこれより短いので間引く。
+    static let clickMinInterval: TimeInterval = 0.032
+
+    /// クリック音の音量。密に重なっても耳に刺さらないところまで下げてある。
+    static let clickGain: Float = 0.7
 }

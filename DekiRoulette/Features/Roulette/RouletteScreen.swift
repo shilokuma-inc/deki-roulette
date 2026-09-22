@@ -3,7 +3,9 @@ import SwiftUI
 struct RouletteScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @AppStorage(Config.soundEnabledKey) private var soundEnabled = true
     @State private var model = RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems))
+    @State private var sound = SpinSoundPlayer()
 
     var body: some View {
         PageFrame(
@@ -38,6 +40,8 @@ struct RouletteScreen: View {
                 AccessibilityNotification.Announcement(L10n.resultAnnounce(result)).post()
             }
         }
+        .onAppear { if soundEnabled { sound.prepare() } }
+        .onDisappear { sound.stop() }
     }
 
     private var wheelSection: some View {
@@ -81,6 +85,7 @@ struct RouletteScreen: View {
 
     private func spin() {
         guard let next = model.beginSpin(reducedMotion: reduceMotion) else { return }
+        if soundEnabled { sound.play(at: model.clickTimes) }
         if reduceMotion {
             // 動きを減らす設定では回さずに止まる。終了は保険のタイマーが担う
             model.rotation = next

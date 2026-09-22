@@ -20,6 +20,31 @@ struct RouletteModelTests {
         #expect(model.items.isEmpty)
     }
 
+    @Test func 複数のラベルをまとめて追加できる() {
+        let model = makeModel([])
+        let added = model.addItems(["A", "  B  C ", "   ", "D"])
+        #expect(added == 3)
+        #expect(model.items.map(\.label) == ["A", "B C", "D"])
+    }
+
+    @Test func まとめて追加しても上限を超えた分は切り捨てる() {
+        let model = makeModel(["A", "B"])
+        let added = model.addItems((0..<30).map { "項目\($0)" })
+        #expect(added == Config.maxItems - 2)
+        #expect(model.items.count == Config.maxItems)
+        #expect(model.items.last?.label == "項目\(Config.maxItems - 3)")
+        #expect(model.addItems(["E"]) == 0)
+    }
+
+    @Test func まとめて追加すると結果が消える() {
+        let model = makeModel()
+        model.rotation = model.beginSpin(reducedMotion: false)!
+        model.finishSpin()
+        #expect(model.result != nil)
+        model.addItems(["E", "F"])
+        #expect(model.result == nil)
+    }
+
     @Test func 項目が2つ未満なら回せない() {
         let model = makeModel(["A"])
         #expect(!model.canSpin)
@@ -112,6 +137,14 @@ struct RouletteModelTests {
 
     private func makeStore(_ storage: InMemoryStorage) -> ItemStore {
         ItemStore(key: .roulette, storage: storage, defaultLabels: { ["A", "B", "C", "D"] })
+    }
+
+    @Test func まとめて追加したときも保存する() {
+        let storage = InMemoryStorage()
+        let store = makeStore(storage)
+        let model = RouletteModel(store: store)
+        model.addItems(["E", "F"])
+        #expect(store.loadSaved()?.map(\.label) == ["A", "B", "C", "D", "E", "F"])
     }
 
     @Test func 追加と削除のたびに保存する() {

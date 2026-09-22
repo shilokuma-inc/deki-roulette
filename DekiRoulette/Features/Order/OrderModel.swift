@@ -48,6 +48,18 @@ final class OrderModel {
         persist()
     }
 
+    /// 複数のラベルをまとめて追加する。上限に収まらない分は切り捨て、追加できた件数を返す。
+    @discardableResult
+    func addItems(_ raws: [String]) -> Int {
+        let labels = raws.map(ItemLabel.normalize).filter { !$0.isEmpty }
+        let accepted = Array(labels.prefix(max(0, Config.maxItems - items.count)))
+        guard !accepted.isEmpty else { return 0 }
+        items.append(contentsOf: ItemLabel.makeItems(accepted))
+        ordered = nil
+        persist()
+        return accepted.count
+    }
+
     func removeItem(id: UUID) {
         items.removeAll { $0.id == id }
         if firstId == id { firstId = nil }

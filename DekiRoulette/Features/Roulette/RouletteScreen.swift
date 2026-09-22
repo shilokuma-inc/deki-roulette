@@ -3,6 +3,7 @@ import SwiftUI
 struct RouletteScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     let model: RouletteModel
 
     var body: some View {
@@ -51,8 +52,9 @@ struct RouletteScreen: View {
             )
             .frame(maxWidth: 320)
 
+            // 結果の有無で下のボタンが動かないよう高さを固定する。大きい文字では枠からはみ出るので最小高さだけ残す
             resultStatus
-                .frame(height: 56)
+                .frame(minHeight: 56, maxHeight: TypeLayout.growsFixedAreas(for: typeSize) ? nil : 56)
 
             PrimaryActionButton(
                 title: model.spinning ? L10n.spinning : L10n.spin,
@@ -122,4 +124,9 @@ struct RouletteScreen: View {
 
 #Preview {
     RouletteScreen(model: RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems)))
+}
+
+#Preview("AX5") {
+    RouletteScreen(model: RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems)))
+        .dynamicTypeSize(.accessibility5)
 }

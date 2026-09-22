@@ -24,6 +24,10 @@ iOS 固有の差分は SPEC.md の「iOS 版との対応」に追記する。
 - ロジックは `Core/` の純粋関数に寄せ、乱数は `RandomNumberGenerator` を注入できるようにしてテストする（テストは Swift Testing）。
 - 文言は `Localizable.xcstrings` にだけ置き、`L10n` 経由で読む。表示言語は OS 設定に従い、アプリ内切替は持たない。
 - 配色・アニメーションは `Theme` に集約。`gold` は順番決めの 1 位とフォーカスリング専用（ルーレットの結果表示は止まったスライスと同じ色）、`flare` は開始ボタン専用。印に専用色は使わない。
+- 色は端末の外観設定に従う。トークンは `Color(light:dark:)` で 2 値を持ち、アプリ内に切替は置かない。
+  盤面と開始ボタンの塗りは外観に依らず固定（`onSlice` / `wheel*` / `onFlare`）で、スライス色を文字や
+  色見本に使うところは `sliceColor(at:)` ではなく `sliceAccent(at:)` を使う。追加した配色は
+  `ThemeContrastTests` でコントラスト比を検証する。
 
 ### スピンの仕組み
 

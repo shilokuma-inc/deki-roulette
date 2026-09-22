@@ -32,7 +32,7 @@ struct OrderScreen: View {
                     busy: model.revealing,
                     concealMarks: model.revealing || model.ordered != nil,
                     atCapacity: model.atCapacity,
-                    onAdd: { model.addItem($0) },
+                    onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
                     onLongPress: { model.cycleMark(id: $0) }
                 )

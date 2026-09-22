@@ -26,7 +26,7 @@ struct RouletteScreen: View {
                     busy: model.spinning,
                     concealMarks: model.spinning,
                     atCapacity: model.atCapacity,
-                    onAdd: { model.addItem($0) },
+                    onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
                     onLongPress: { model.toggleTarget(id: $0) }
                 )
@@ -62,7 +62,7 @@ struct RouletteScreen: View {
     private var resultStatus: some View {
         if let outcome = model.outcome {
             // 止まったスライスと同じ色で出す
-            let color = Theme.sliceColor(at: outcome.index)
+            let color = Theme.sliceAccent(at: outcome.index)
             Text(outcome.label)
                 .font(.title3.weight(.black))
                 .foregroundStyle(color)

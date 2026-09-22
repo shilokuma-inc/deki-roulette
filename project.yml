@@ -41,7 +41,6 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        UIUserInterfaceStyle: Dark
         ITSAppUsesNonExemptEncryption: false
     settings:
       base:

@@ -393,4 +393,6 @@ iOS 版には対応物が無い、または OS が代替する項目。
 | `aria-live` の結果通知 | `AccessibilityNotification.Announcement` | |
 | プリレンダ、SEO、sitemap、CSP、hreflang | 無し | Web 固有 |
 | ラベル 20 文字（UTF-16 単位） | 20 文字（`Character` 単位） | 絵文字等の結合文字で差が出る |
-| フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートの「著作権」項目 | 帰属の文（basekeita と Takumi Muraishi の連名）と `© 2026 basekeita, Takumi Muraishi` を載せる。設定の項目は現状これだけ（`SettingsView`） |
+| フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートの「著作権」項目 | 帰属の文（basekeita と Takumi Muraishi の連名）と `© 2026 basekeita, Takumi Muraishi` を載せる（`SettingsView`） |
+| 音は鳴らさない | スピン中の回転音（`SpinSoundPlayer`） | 針がスライスの境目を越えるたびに短いクリック音を鳴らす。鳴らす時刻は `SpinTicks` が `SPIN_EASING` を逆算して求め、32ms（`clickMinInterval`）より詰まったものは間引くので、序盤は連打、終盤は減速に合わせて間隔が開く。波形は `ClickTrack` が 1 本に合成して一度に流す。音源は `Resources/Sounds/click.wav`（`scripts/make-click-sound.swift` で生成）。`AVAudioSession` は `.ambient` なので消音スイッチに従い、他アプリの音は止めない。`accessibilityReduceMotion` では盤面が回らないので鳴らさない |
+| （設定は無し） | 設定シートの「効果音」 | 回転音の ON / OFF。既定は ON（`UserDefaults` の `soundEnabled`）。設定の項目は効果音と著作権の 2 つ |

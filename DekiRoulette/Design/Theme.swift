@@ -8,6 +8,7 @@ import UIKit
 /// 盤面だけは外観に依らず同じ見た目にする（`MARK: 盤面` を参照）。
 enum Theme {
     /// 画面の背景。スライスの区切り線とラベルには使わない（`onSlice` を使う）。
+    /// ローンチ画面の `LaunchBackground`（`Assets.xcassets`）にも同じ 2 値を置いているので、変えるときは両方を合わせる。
     static let ink900 = Color(light: 0xFAF7F2, dark: 0x17111F)
     /// カード・入力欄・タブバーの背景。
     static let ink800 = Color(light: 0xFFFFFF, dark: 0x1F1829)

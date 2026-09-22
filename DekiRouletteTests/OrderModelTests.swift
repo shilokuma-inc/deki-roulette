@@ -147,4 +147,80 @@ struct OrderModelTests {
         model.cycleMark(id: model.items[0].id)
         #expect(model.ordered == nil)
     }
+
+    @Test func 複数のラベルをまとめて追加できる() {
+        let model = makeModel([])
+        let added = model.addItems(["A", "  B  C ", "   ", "D"])
+        #expect(added == 3)
+        #expect(model.items.map(\.label) == ["A", "B C", "D"])
+    }
+
+    @Test func まとめて追加しても上限を超えた分は切り捨てる() {
+        let model = makeModel(["A", "B"])
+        let added = model.addItems((0..<30).map { "項目\($0)" })
+        #expect(added == Config.maxItems - 2)
+        #expect(model.items.count == Config.maxItems)
+        #expect(model.addItems(["E"]) == 0)
+    }
+
+    @Test func まとめて追加すると結果が消える() {
+        let model = makeModel()
+        model.shuffleItems(reducedMotion: true)
+        #expect(model.ordered != nil)
+        model.addItems(["E", "F"])
+        #expect(model.ordered == nil)
+    }
+
+    // MARK: 永続化
+
+    private func makeStore(_ storage: InMemoryStorage) -> ItemStore {
+        ItemStore(key: .order, storage: storage, defaultLabels: { ["A", "B", "C", "D"] })
+    }
+
+    @Test func まとめて追加したときも保存する() {
+        let storage = InMemoryStorage()
+        let store = makeStore(storage)
+        let model = OrderModel(store: store)
+        model.addItems(["E", "F"])
+        #expect(store.loadSaved()?.map(\.label) == ["A", "B", "C", "D", "E", "F"])
+    }
+
+    @Test func 追加と削除のたびに保存する() {
+        let storage = InMemoryStorage()
+        let store = makeStore(storage)
+        let model = OrderModel(store: store)
+        #expect(store.loadSaved() == nil)
+        model.addItem("E")
+        #expect(store.loadSaved()?.map(\.label) == ["A", "B", "C", "D", "E"])
+        model.removeItem(id: model.items[0].id)
+        #expect(store.loadSaved()?.map(\.label) == ["B", "C", "D", "E"])
+    }
+
+    @Test func 保存した項目から始まるが指定は残らない() {
+        let storage = InMemoryStorage()
+        let first = OrderModel(store: makeStore(storage))
+        first.addItem("E")
+        first.cycleMark(id: first.items[0].id)
+        first.cycleMark(id: first.items[1].id)
+        first.cycleMark(id: first.items[1].id)
+
+        let second = OrderModel(store: makeStore(storage))
+        #expect(second.items == first.items)
+        #expect(second.marks.isEmpty)
+    }
+
+    @Test func 初期状態に戻すと指定と結果も消え保存データも消える() {
+        let storage = InMemoryStorage()
+        let store = makeStore(storage)
+        let model = OrderModel(store: store)
+        model.addItem("E")
+        model.cycleMark(id: model.items[0].id)
+        model.shuffleItems(reducedMotion: true)
+
+        model.resetItems()
+        #expect(model.items.map(\.label) == ["A", "B", "C", "D"])
+        #expect(model.marks.isEmpty)
+        #expect(model.ordered == nil)
+        #expect(store.loadSaved() == nil)
+    }
 }

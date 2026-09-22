@@ -3,7 +3,7 @@ import SwiftUI
 struct OrderScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var model = OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems))
+    let model: OrderModel
 
     // コピー済みかどうかは「どの結果をコピーしたか」から導く。
     @State private var copiedResultId: UUID?
@@ -32,7 +32,7 @@ struct OrderScreen: View {
                     busy: model.revealing,
                     concealMarks: model.revealing || model.ordered != nil,
                     atCapacity: model.atCapacity,
-                    onAdd: { model.addItem($0) },
+                    onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
                     onRemoveAll: { model.removeAll() },
                     onRestore: { model.restore($0, at: $1) },
@@ -95,5 +95,5 @@ struct OrderScreen: View {
 }
 
 #Preview {
-    OrderScreen()
+    OrderScreen(model: OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems)))
 }

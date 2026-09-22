@@ -23,8 +23,18 @@ final class RouletteModel {
     private var pendingOutcome: SpinOutcome?
     private var fallbackTask: Task<Void, Never>?
 
+    /// 項目の保存先。nil のときは保存しない（プレビューやテスト向け）。
+    private let store: ItemStore?
+
     init(items: [Item]) {
         self.items = items
+        store = nil
+    }
+
+    /// 保存済みの項目から始める。無ければ初期項目。
+    init(store: ItemStore) {
+        self.store = store
+        items = store.load()
     }
 
     var canSpin: Bool { !spinning && items.count >= Config.minItems }
@@ -42,6 +52,19 @@ final class RouletteModel {
         guard !label.isEmpty, !atCapacity else { return }
         items.append(Item(label: label))
         outcome = nil
+        persist()
+    }
+
+    /// 複数のラベルをまとめて追加する。上限に収まらない分は切り捨て、追加できた件数を返す。
+    @discardableResult
+    func addItems(_ raws: [String]) -> Int {
+        let labels = raws.map(ItemLabel.normalize).filter { !$0.isEmpty }
+        let accepted = Array(labels.prefix(max(0, Config.maxItems - items.count)))
+        guard !accepted.isEmpty else { return 0 }
+        items.append(contentsOf: ItemLabel.makeItems(accepted))
+        outcome = nil
+        persist()
+        return accepted.count
     }
 
     /// 項目を削除し、削除した項目と元の位置を返す。「元に戻す」（`restore`）に使う。
@@ -51,6 +74,7 @@ final class RouletteModel {
         let item = items.remove(at: index)
         if targetId == id { targetId = nil }
         outcome = nil
+        persist()
         return RemovedItem(item: item, index: index)
     }
 
@@ -59,6 +83,7 @@ final class RouletteModel {
         items.removeAll()
         targetId = nil
         outcome = nil
+        persist()
     }
 
     /// 削除した項目を元の位置に戻す。指定は復元しない。
@@ -67,6 +92,26 @@ final class RouletteModel {
         guard !items.contains(where: { $0.id == item.id }), !atCapacity else { return }
         items.insert(item, at: min(index, items.count))
         outcome = nil
+        persist()
+    }
+
+    /// 項目を丸ごと入れ替える。指定と結果は前のリストのものなので捨てる。
+    func replaceItems(_ next: [Item]) {
+        items = next
+        targetId = nil
+        outcome = nil
+        persist()
+    }
+
+    /// 項目を初期状態に戻す。保存データも消すので、以降は言語設定に応じた初期項目に追従する。
+    func resetItems() {
+        guard let store else { return }
+        replaceItems(store.defaultItems)
+        store.clear()
+    }
+
+    private func persist() {
+        store?.save(items)
     }
 
     /// 長押しで当たりの指定と解除を切り替える。

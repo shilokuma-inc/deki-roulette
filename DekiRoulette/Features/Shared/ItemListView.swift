@@ -9,7 +9,8 @@ struct ItemListView: View {
     /// 印を無条件に伏せる。演出中と結果表示中に立てる。
     let concealMarks: Bool
     let atCapacity: Bool
-    let onAdd: (String) -> Void
+    /// 正規化済みのラベルをまとめて渡す。戻り値は上限に収まって追加できた件数。
+    let onAdd: ([String]) -> Int
     let onRemove: (UUID) -> Void
     let onLongPress: (UUID) -> Void
 
@@ -21,7 +22,8 @@ struct ItemListView: View {
     @AppStorage(Config.hapticsEnabledKey) private var hapticsEnabled = true
     @FocusState private var inputFocused: Bool
 
-    private var trimmed: String { input.trimmingCharacters(in: .whitespacesAndNewlines) }
+    /// 入力を行ごとに正規化したもの。改行区切りの貼り付けはここで複数件になる。
+    private var lines: [String] { ItemLabel.splitLines(input) }
     private var inputDisabled: Bool { busy || atCapacity }
 
     /// 指定した本人だけが確認できればよいので、印は項目に触れている間と
@@ -40,6 +42,10 @@ struct ItemListView: View {
             footnotes
         }
         .onDisappear { hintTask?.cancel() }
+        // 上限に達したり演出が始まったりして入力できなくなったら、開いたままのキーボードを閉じる
+        .onChange(of: inputDisabled) { _, disabled in
+            if disabled { inputFocused = false }
+        }
         // 指定が切り替わった瞬間の軽い手応え。本人の指にしか伝わらないので見た目には何も足さない
         .sensoryFeedback(trigger: markToggleCount) { _, _ in
             hapticsEnabled ? .impact(weight: Config.hapticMarkToggleWeight) : nil
@@ -60,15 +66,24 @@ struct ItemListView: View {
 
     private var addForm: some View {
         HStack(spacing: 8) {
-            TextField(L10n.addPlaceholder, text: $input)
+            // 複数行の入力欄にして、改行区切りの貼り付けをそのまま受ける。1 行の入力欄では
+            // 改行が見えず、何件になるのか分からない。
+            TextField(L10n.addPlaceholder, text: $input, axis: .vertical)
                 .textFieldStyle(.plain)
+                .lineLimit(1...Config.bulkInputVisibleLines)
                 .focused($inputFocused)
-                .submitLabel(.done)
+                .submitLabel(.return)
                 .onSubmit(handleAdd)
                 .onChange(of: input) { _, newValue in
-                    if newValue.count > Config.maxLabelLength {
-                        input = String(newValue.prefix(Config.maxLabelLength))
+                    // 複数行の入力欄では Return が改行として入る。末尾の改行を送信の合図として扱い、
+                    // 追加したあともキーボードは開いたままにする
+                    if newValue.last?.isNewline == true {
+                        if lines.isEmpty { input = "" } else { handleAdd() }
+                        return
                     }
+                    // 上限の文字数は行ごとに掛ける。入力欄全体で切ると 2 行目以降が消える
+                    let clamped = ItemLabel.clampLines(newValue)
+                    if clamped != newValue { input = clamped }
                 }
                 .disabled(inputDisabled)
                 .font(.subheadline)
@@ -83,15 +98,15 @@ struct ItemListView: View {
                 .opacity(inputDisabled ? 0.4 : 1)
 
             Button(action: handleAdd) {
-                Text(L10n.addButton)
+                Text(lines.count > 1 ? L10n.addItemsButton(lines.count) : L10n.addButton)
                     .font(.subheadline.weight(.bold))
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
             }
             .buttonStyle(.plain)
-            .foregroundStyle(inputDisabled || trimmed.isEmpty ? Theme.muted.opacity(0.6) : Theme.ivory)
-            .background(inputDisabled || trimmed.isEmpty ? Theme.ink800 : Theme.ink700, in: .rect(cornerRadius: 12))
-            .disabled(inputDisabled || trimmed.isEmpty)
+            .foregroundStyle(inputDisabled || lines.isEmpty ? Theme.muted.opacity(0.6) : Theme.ivory)
+            .background(inputDisabled || lines.isEmpty ? Theme.ink800 : Theme.ink700, in: .rect(cornerRadius: 12))
+            .disabled(inputDisabled || lines.isEmpty)
         }
     }
 
@@ -141,9 +156,16 @@ struct ItemListView: View {
     }
 
     private func handleAdd() {
-        guard !trimmed.isEmpty, !inputDisabled else { return }
-        onAdd(trimmed)
+        let lines = lines
+        guard !lines.isEmpty, !inputDisabled else { return }
+        let added = onAdd(lines)
         input = ""
+        // 続けて次の項目を入力できるようにフォーカスを保つ。キーボードは下スワイプで閉じられる
+        inputFocused = true
+        // 上限で切り捨てた分があれば、画面の「項目は N 個までです」と同じ内容を読み上げる
+        if added < lines.count {
+            AccessibilityNotification.Announcement(L10n.atCapacity(Config.maxItems)).post()
+        }
     }
 
     private func handleLongPress(_ id: UUID) {
@@ -221,7 +243,7 @@ private struct ItemRow: View {
         busy: false,
         concealMarks: false,
         atCapacity: false,
-        onAdd: { _ in },
+        onAdd: { $0.count },
         onRemove: { _ in },
         onLongPress: { _ in }
     )
@@ -236,7 +258,7 @@ private struct ItemRow: View {
         busy: false,
         concealMarks: false,
         atCapacity: false,
-        onAdd: { _ in },
+        onAdd: { $0.count },
         onRemove: { _ in },
         onLongPress: { _ in }
     )

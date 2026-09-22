@@ -31,6 +31,8 @@ enum Config {
     /// コピーできたことを伝える表示を出しておく時間。
     static let copyFeedbackDuration: TimeInterval = 1.8
 
+    /// 追加の入力欄が伸びる行数の上限。改行区切りの貼り付けはこの行数を超えるとスクロールする。
+    static let bulkInputVisibleLines = 5
     /// スピンのイージング（Web 版 `SPIN_EASING`）。`Theme.spinAnimation` と、触覚の発火時刻の逆算の両方で使う。
     static let spinEasing = CubicBezierCurve(0.15, 0.85, 0.3, 1)
 

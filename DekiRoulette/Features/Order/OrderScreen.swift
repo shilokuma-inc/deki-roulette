@@ -3,7 +3,7 @@ import SwiftUI
 struct OrderScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var model = OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems))
+    let model: OrderModel
     @AppStorage(Config.hapticsEnabledKey) private var hapticsEnabled = true
 
     // コピー済みかどうかは「どの結果をコピーしたか」から導く。
@@ -33,7 +33,7 @@ struct OrderScreen: View {
                     busy: model.revealing,
                     concealMarks: model.revealing || model.ordered != nil,
                     atCapacity: model.atCapacity,
-                    onAdd: { model.addItem($0) },
+                    onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
                     onLongPress: { model.cycleMark(id: $0) }
                 )
@@ -101,5 +101,5 @@ struct OrderScreen: View {
 }
 
 #Preview {
-    OrderScreen()
+    OrderScreen(model: OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems)))
 }

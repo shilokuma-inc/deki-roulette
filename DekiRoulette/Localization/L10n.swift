@@ -62,6 +62,11 @@ enum L10n {
     static var share: String { tr("share") }
     static var resultHeading: String { tr("resultHeading") }
     static var appName: String { tr("appName") }
+    static var removeAll: String { tr("removeAll") }
+    static var removeAllConfirmTitle: String { tr("removeAllConfirmTitle") }
+    static var cancel: String { tr("cancel") }
+    static func removedToast(_ label: String) -> String { fmt("removedToast", label) }
+    static var undo: String { tr("undo") }
 
     static var defaultItems: [String] { lines("defaultItems") }
     static var orderDefaultItems: [String] { lines("orderDefaultItems") }

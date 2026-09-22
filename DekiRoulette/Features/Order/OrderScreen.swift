@@ -29,6 +29,8 @@ struct OrderScreen: View {
                     atCapacity: model.atCapacity,
                     onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
+                    onRemoveAll: { model.removeAll() },
+                    onRestore: { model.restore($0, at: $1) },
                     onLongPress: { model.cycleMark(id: $0) }
                 )
                 .frame(maxWidth: sizeClass == .regular ? 320 : .infinity)

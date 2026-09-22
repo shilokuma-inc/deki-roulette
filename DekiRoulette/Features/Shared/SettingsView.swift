@@ -1,13 +1,24 @@
 import SwiftUI
 
-/// ヘッダ右上のアイコンから開く設定。いまは著作権の項目だけを置く。
+/// ヘッダ右上のアイコンから開く設定。効果音の切り替えと著作権を置く。
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(Config.soundEnabledKey) private var soundEnabled = true
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    SettingsSection(title: L10n.soundTitle) {
+                        Toggle(L10n.soundToggle, isOn: $soundEnabled)
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.ivory)
+                            .tint(Theme.ivory)
+                        Text(L10n.soundNote)
+                            .font(.caption)
+                            .foregroundStyle(Theme.muted)
+                    }
+
                     SettingsSection(title: L10n.copyrightTitle) {
                         Text(L10n.copyrightOwner)
                             .font(.subheadline)

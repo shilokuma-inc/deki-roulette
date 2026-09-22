@@ -30,6 +30,9 @@ iOS 固有の差分は SPEC.md の「iOS 版との対応」に追記する。
   `ThemeContrastTests` でコントラスト比を検証する。
 - レイアウトの寸法（盤面の上限、横並びの列幅、ページ幅）は `Theme.Layout` に置く。`horizontalSizeClass == .regular`
   で横並びになり、盤面は 480pt まで広がる。盤面ラベルの省略と文字サイズは `WheelLabel`（`Core/`）が直径から決める。
+- 項目リストは `ItemStore`（`Core/`）が画面ごとに `UserDefaults` へ保存する。保存するのは `id` と `label` だけで、
+  指定（`targetId` / `firstId` / `lastId`）は保存しない。保存データが無い・読めないときだけ `L10n` の初期項目を使う。
+  両モデルは `RootView` が生成して各 Screen に渡し、設定シートが両方を初期化できるよう environment にも流す。
 
 ### スピンの仕組み
 
@@ -54,4 +57,5 @@ Web 版と同じ。以下は仕様であって削ったり戻したりしない�
 - 印は色見本をリングに変えるだけ（末尾は中心に点）。行を押している間と指定直後 `targetHintDuration` の間しか出さず、
   演出中と結果表示中は伏せる（`ItemListView` の `concealMarks`）。伏せている行には `.isSelected` も `accessibilityValue` も付けない。
 - 隠し操作の説明はフッターの「使い方」内にのみ置き、演出開始で自動的に閉じる（`PageFrame`）。
-- 英語の表示名は一般語「Roulette」。本文に「当たり」「必ず」等の語を置かない。
+- 英語の表示名はブランド名「DekiRoulette」（Web 版の一般語「Roulette」とは異なる iOS 固有の差分）。
+  タブ・ナビのラベルは一般語のまま。本文に「当たり」「必ず」等の語を置かない。

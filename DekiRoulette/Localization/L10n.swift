@@ -51,6 +51,14 @@ enum L10n {
     static var copyright: String { tr("copyright") }
     static var copyrightTitle: String { tr("copyrightTitle") }
     static var copyrightOwner: String { tr("copyrightOwner") }
+    static func addItemsButton(_ count: Int) -> String { plural("addItemsButton", count) }
+    static var resetItemsTitle: String { tr("resetItemsTitle") }
+    static var resetItemsDescription: String { tr("resetItemsDescription") }
+    static var resetItemsRoulette: String { tr("resetItemsRoulette") }
+    static var resetItemsOrder: String { tr("resetItemsOrder") }
+    static func resetItemsConfirm(_ screen: String) -> String { fmt("resetItemsConfirm", screen) }
+    static var resetItemsMessage: String { tr("resetItemsMessage") }
+    static var resetItemsAction: String { tr("resetItemsAction") }
 
     static var defaultItems: [String] { lines("defaultItems") }
     static var orderDefaultItems: [String] { lines("orderDefaultItems") }
@@ -69,6 +77,11 @@ enum L10n {
 
     private static func fmt(_ key: String, _ args: CVarArg...) -> String {
         String(format: tr(key), locale: .current, arguments: args)
+    }
+
+    /// 複数形（`variations.plural`）を持つ文言。件数に応じた形を選ぶ。
+    private static func plural(_ key: String, _ count: Int) -> String {
+        String.localizedStringWithFormat(NSLocalizedString(key, comment: ""), count)
     }
 
     private static func lines(_ key: String) -> [String] {

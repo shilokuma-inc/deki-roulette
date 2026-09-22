@@ -18,6 +18,8 @@ struct ItemListView: View {
     @State private var pressingCount = 0
     @State private var hinting = false
     @State private var hintTask: Task<Void, Never>?
+    @State private var markToggleCount = 0
+    @AppStorage(Config.hapticsEnabledKey) private var hapticsEnabled = true
     @FocusState private var inputFocused: Bool
     /// 入力欄を横並びにするために最低限確保したい幅。文字と同じ比率で伸ばし、
     /// 大きい文字や狭い画面で足りなければ `ViewThatFits` が縦積みに切り替える。
@@ -46,6 +48,10 @@ struct ItemListView: View {
         // 上限に達したり演出が始まったりして入力できなくなったら、開いたままのキーボードを閉じる
         .onChange(of: inputDisabled) { _, disabled in
             if disabled { inputFocused = false }
+        }
+        // 指定が切り替わった瞬間の軽い手応え。本人の指にしか伝わらないので見た目には何も足さない
+        .sensoryFeedback(trigger: markToggleCount) { _, _ in
+            hapticsEnabled ? .impact(weight: Config.hapticMarkToggleWeight) : nil
         }
     }
 
@@ -183,6 +189,7 @@ struct ItemListView: View {
 
     private func handleLongPress(_ id: UUID) {
         onLongPress(id)
+        markToggleCount += 1
         hinting = true
         hintTask?.cancel()
         hintTask = Task {

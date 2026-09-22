@@ -62,6 +62,7 @@ enum L10n {
     static var share: String { tr("share") }
     static var resultHeading: String { tr("resultHeading") }
     static var appName: String { tr("appName") }
+    static var hapticsTitle: String { tr("hapticsTitle") }
 
     static var defaultItems: [String] { lines("defaultItems") }
     static var orderDefaultItems: [String] { lines("orderDefaultItems") }

@@ -42,6 +42,14 @@ iOS 固有の差分は SPEC.md の「iOS 版との対応」に追記する。
 
 盤面は 12 時を 0 度、時計回り。`SliceShape` は `clockwise: false` で画面上は時計回りになる（y 軸が下向きのため）。
 
+### 触覚の仕組み
+
+`sensoryFeedback(_:trigger:)` でモデルの値の変化に反応させる（`spinning` / `outcome` / `revealing` と、
+刻み用のカウンタ `boundaryTick` / `revealTick`）。補間中の角度は observable でないので、`beginSpin` が
+`HapticSchedule.boundaryCrossings`（`Config.spinEasing` を `CubicBezierCurve` で逆算）で境目を越える時刻を
+先に求め、`TickScheduler` の `Task` でカウンタを刻む。完了・中断でキャンセルし、`reducedMotion` では刻まない。
+ON/OFF は `@AppStorage(Config.hapticsEnabledKey)`。設定の文言は「触覚フィードバック」だけで、長押しには触れない。
+
 ### 並べ替えの仕組み
 
 `OrderModel.shuffleItems` が `Shuffler.arrange` を呼ぶ。Fisher-Yates で一様にシャッフルしてから先頭・末尾を入れ替える。

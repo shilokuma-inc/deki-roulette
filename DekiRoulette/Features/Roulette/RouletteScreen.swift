@@ -4,7 +4,7 @@ struct RouletteScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.dynamicTypeSize) private var typeSize
-    @State private var model = RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems))
+    let model: RouletteModel
 
     var body: some View {
         PageFrame(
@@ -27,7 +27,7 @@ struct RouletteScreen: View {
                     busy: model.spinning,
                     concealMarks: model.spinning,
                     atCapacity: model.atCapacity,
-                    onAdd: { model.addItem($0) },
+                    onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
                     onLongPress: { model.toggleTarget(id: $0) }
                 )
@@ -97,10 +97,10 @@ struct RouletteScreen: View {
 }
 
 #Preview {
-    RouletteScreen()
+    RouletteScreen(model: RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems)))
 }
 
 #Preview("AX5") {
-    RouletteScreen()
+    RouletteScreen(model: RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems)))
         .dynamicTypeSize(.accessibility5)
 }

@@ -3,7 +3,7 @@ import SwiftUI
 struct RouletteScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var model = RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems))
+    let model: RouletteModel
 
     var body: some View {
         PageFrame(
@@ -95,5 +95,5 @@ struct RouletteScreen: View {
 }
 
 #Preview {
-    RouletteScreen()
+    RouletteScreen(model: RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems)))
 }

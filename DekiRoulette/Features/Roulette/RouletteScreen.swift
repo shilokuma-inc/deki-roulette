@@ -26,7 +26,7 @@ struct RouletteScreen: View {
                     busy: model.spinning,
                     concealMarks: model.spinning,
                     atCapacity: model.atCapacity,
-                    onAdd: { model.addItem($0) },
+                    onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
                     onLongPress: { model.toggleTarget(id: $0) }
                 )

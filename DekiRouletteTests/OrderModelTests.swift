@@ -80,6 +80,28 @@ struct OrderModelTests {
         #expect(model.ordered == nil)
     }
 
+    @Test func 複数のラベルをまとめて追加できる() {
+        let model = makeModel([])
+        let added = model.addItems(["A", "  B  C ", "   ", "D"])
+        #expect(added == 3)
+        #expect(model.items.map(\.label) == ["A", "B C", "D"])
+    }
+
+    @Test func まとめて追加しても上限を超えた分は切り捨てる() {
+        let model = makeModel(["A", "B"])
+        let added = model.addItems((0..<30).map { "項目\($0)" })
+        #expect(added == Config.maxItems - 2)
+        #expect(model.items.count == Config.maxItems)
+        #expect(model.addItems(["E"]) == 0)
+    }
+
+    @Test func まとめて追加すると結果が消える() {
+        let model = makeModel()
+        model.shuffleItems(reducedMotion: true)
+        #expect(model.ordered != nil)
+        model.addItems(["E", "F"])
+        #expect(model.ordered == nil)
+    }
 
     // MARK: 永続化
 

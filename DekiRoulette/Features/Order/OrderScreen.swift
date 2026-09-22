@@ -6,12 +6,6 @@ struct OrderScreen: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     let model: OrderModel
 
-    // コピー済みかどうかは「どの結果をコピーしたか」から導く。
-    @State private var copiedResultId: UUID?
-    @State private var copyTask: Task<Void, Never>?
-
-    private var copied: Bool { model.ordered != nil && copiedResultId == model.resultId }
-
     var body: some View {
         PageFrame(
             title: L10n.orderTitle,
@@ -40,7 +34,6 @@ struct OrderScreen: View {
                 .frame(maxWidth: sizeClass == .regular ? 320 : .infinity)
             }
         }
-        .onDisappear { copyTask?.cancel() }
     }
 
     private var resultSection: some View {
@@ -60,37 +53,18 @@ struct OrderScreen: View {
             )
 
             ZStack {
-                if model.ordered != nil && !model.revealing {
-                    Button(action: copyResult) {
-                        Text(copied ? L10n.orderCopied : L10n.orderCopy)
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(Theme.muted)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 6)
-                            .background(Theme.ink800, in: .capsule)
-                            .overlay(Capsule().strokeBorder(Theme.ink700, lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
+                // 演出が終わって結果が出ている間だけ出す。結果が変わると作り直されるので
+                // 「コピーしました」も自然に戻る
+                if let ordered = model.ordered, !model.revealing {
+                    let text = ResultText.order(ordered.map(\.label))
+                    ResultActions(copyText: text, shareText: ResultText.share(text, appName: L10n.appName))
+                        .id(model.resultId)
                 }
             }
             // コピーボタンの有無で上のボタンが動かないよう高さを固定する。大きい文字では最小高さだけ残す
             .frame(minHeight: 32, maxHeight: TypeLayout.growsFixedAreas(for: typeSize) ? nil : 32)
         }
         .frame(maxWidth: .infinity)
-    }
-
-    private func copyResult() {
-        guard let ordered = model.ordered else { return }
-        UIPasteboard.general.string = ordered.enumerated()
-            .map { "\($0.offset + 1). \($0.element.label)" }
-            .joined(separator: "\n")
-        copiedResultId = model.resultId
-        copyTask?.cancel()
-        copyTask = Task {
-            try? await Task.sleep(for: .seconds(Config.copyFeedbackDuration))
-            guard !Task.isCancelled else { return }
-            copiedResultId = nil
-        }
     }
 }
 

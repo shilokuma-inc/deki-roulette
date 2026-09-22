@@ -3,6 +3,7 @@ import SwiftUI
 struct OrderScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     let model: OrderModel
     @AppStorage(Config.hapticsEnabledKey) private var hapticsEnabled = true
 
@@ -68,7 +69,8 @@ struct OrderScreen: View {
                         .id(model.resultId)
                 }
             }
-            .frame(height: 32)
+            // コピーボタンの有無で上のボタンが動かないよう高さを固定する。大きい文字では最小高さだけ残す
+            .frame(minHeight: 32, maxHeight: TypeLayout.growsFixedAreas(for: typeSize) ? nil : 32)
         }
         .frame(maxWidth: .infinity)
     }
@@ -76,4 +78,9 @@ struct OrderScreen: View {
 
 #Preview {
     OrderScreen(model: OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems)))
+}
+
+#Preview("AX5") {
+    OrderScreen(model: OrderModel(items: ItemLabel.makeItems(L10n.orderDefaultItems)))
+        .dynamicTypeSize(.accessibility5)
 }

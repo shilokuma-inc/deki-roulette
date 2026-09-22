@@ -36,8 +36,6 @@ enum L10n {
     static var orderResultPlaceholder: String { tr("orderResultPlaceholder") }
     static var orderResultTitle: String { tr("orderResultTitle") }
     static func orderRankAccessibilityLabel(_ rank: Int) -> String { fmt("orderRankAccessibilityLabel", rank) }
-    static var orderCopy: String { tr("orderCopy") }
-    static var orderCopied: String { tr("orderCopied") }
     static var orderMarkFirst: String { tr("orderMarkFirst") }
     static var orderMarkLast: String { tr("orderMarkLast") }
     static var orderHelpBasic: String { tr("orderHelpBasic") }
@@ -59,6 +57,11 @@ enum L10n {
     static func resetItemsConfirm(_ screen: String) -> String { fmt("resetItemsConfirm", screen) }
     static var resetItemsMessage: String { tr("resetItemsMessage") }
     static var resetItemsAction: String { tr("resetItemsAction") }
+    static var copyResult: String { tr("copyResult") }
+    static var copied: String { tr("copied") }
+    static var share: String { tr("share") }
+    static var resultHeading: String { tr("resultHeading") }
+    static var appName: String { tr("appName") }
     static var listMenuLabel: String { tr("listMenuLabel") }
     static var saveListAction: String { tr("saveListAction") }
     static var loadListAction: String { tr("loadListAction") }

@@ -231,13 +231,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add your options and press Spin. You can register between 2 and 24 items."
+            "value" : "Add your options and press Spin. You can register between 2 and 24 items. Paste text with one entry per line to add them all at once."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "項目を追加してスピンを押すだけです。項目は 2 個から 24 個まで登録できます。"
+            "value" : "項目を追加してスピンを押すだけです。項目は 2 個から 24 個まで登録できます。改行区切りの文章を貼り付けると、まとめて追加できます。"
           }
         }
       }
@@ -469,13 +469,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add your entries and press Shuffle. You can register between 2 and 24 items."
+            "value" : "Add your entries and press Shuffle. You can register between 2 and 24 items. Paste text with one entry per line to add them all at once."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "項目を追加して並べ替えを押すだけです。項目は 2 個から 24 個まで登録できます。"
+            "value" : "項目を追加して並べ替えを押すだけです。項目は 2 個から 24 個まで登録できます。改行区切りの文章を貼り付けると、まとめて追加できます。"
           }
         }
       }
@@ -684,6 +684,125 @@
         }
       }
     },
+    "resetItemsAction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初期状態に戻す"
+          }
+        }
+      }
+    },
+    "resetItemsConfirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset the items of “%@” to the initial ones?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」の項目を初期状態に戻しますか？"
+          }
+        }
+      }
+    },
+    "resetItemsDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your item lists are saved automatically and restored the next time you open the app. Use these to go back to the initial items."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目リストは自動で保存され、次に開いたときも残ります。最初の項目に戻したいときはここから戻せます。"
+          }
+        }
+      }
+    },
+    "resetItemsMessage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The current items will be removed and replaced with the initial ones."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いまの項目は消えて、最初の項目に置き換わります。"
+          }
+        }
+      }
+    },
+    "resetItemsOrder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Random Order Items"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "順番決めの項目を戻す"
+          }
+        }
+      }
+    },
+    "resetItemsRoulette" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Roulette Items"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ルーレットの項目を戻す"
+          }
+        }
+      }
+    },
+    "resetItemsTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Items"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目を初期状態に戻す"
+          }
+        }
+      }
+    },
     "resultAnnounce" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -809,7 +928,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Roulette"
+            "value" : "DekiRoulette"
           }
         },
         "ja" : {
@@ -850,6 +969,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "こんなときに"
+          }
+        }
+      }
+    },
+    "addItemsButton" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Add %lld items"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld 件追加"
+                }
+              }
+            }
           }
         }
       }

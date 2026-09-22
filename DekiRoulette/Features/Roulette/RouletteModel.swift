@@ -63,6 +63,7 @@ final class RouletteModel {
         guard !accepted.isEmpty else { return 0 }
         items.append(contentsOf: ItemLabel.makeItems(accepted))
         outcome = nil
+        persist()
         return accepted.count
     }
 

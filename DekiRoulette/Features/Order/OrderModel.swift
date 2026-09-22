@@ -56,6 +56,7 @@ final class OrderModel {
         guard !accepted.isEmpty else { return 0 }
         items.append(contentsOf: ItemLabel.makeItems(accepted))
         ordered = nil
+        persist()
         return accepted.count
     }
 

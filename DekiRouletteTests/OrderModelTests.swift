@@ -109,6 +109,14 @@ struct OrderModelTests {
         ItemStore(key: .order, storage: storage, defaultLabels: { ["A", "B", "C", "D"] })
     }
 
+    @Test func まとめて追加したときも保存する() {
+        let storage = InMemoryStorage()
+        let store = makeStore(storage)
+        let model = OrderModel(store: store)
+        model.addItems(["E", "F"])
+        #expect(store.loadSaved()?.map(\.label) == ["A", "B", "C", "D", "E", "F"])
+    }
+
     @Test func 追加と削除のたびに保存する() {
         let storage = InMemoryStorage()
         let store = makeStore(storage)

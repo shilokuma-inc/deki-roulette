@@ -3,8 +3,9 @@ import SwiftUI
 struct RouletteScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     @AppStorage(Config.soundEnabledKey) private var soundEnabled = true
-    @State private var model = RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems))
+    let model: RouletteModel
     @State private var sound = SpinSoundPlayer()
 
     var body: some View {
@@ -28,7 +29,7 @@ struct RouletteScreen: View {
                     busy: model.spinning,
                     concealMarks: model.spinning,
                     atCapacity: model.atCapacity,
-                    onAdd: { model.addItem($0) },
+                    onAdd: { model.addItems($0) },
                     onRemove: { model.removeItem(id: $0) },
                     onLongPress: { model.toggleTarget(id: $0) }
                 )
@@ -49,8 +50,9 @@ struct RouletteScreen: View {
             RouletteWheelView(items: model.items, rotation: model.rotation)
                 .frame(maxWidth: 320)
 
+            // 結果の有無で下のボタンが動かないよう高さを固定する。大きい文字では枠からはみ出るので最小高さだけ残す
             resultStatus
-                .frame(height: 56)
+                .frame(minHeight: 56, maxHeight: TypeLayout.growsFixedAreas(for: typeSize) ? nil : 56)
 
             PrimaryActionButton(
                 title: model.spinning ? L10n.spinning : L10n.spin,
@@ -58,6 +60,16 @@ struct RouletteScreen: View {
                 enabled: model.canSpin,
                 action: spin
             )
+
+            ZStack {
+                // 結果が出ている間だけ出す。順番決めと同じ位置・同じ見た目
+                if let outcome = model.outcome, !model.spinning {
+                    let text = ResultText.roulette(label: outcome.label, heading: L10n.resultHeading)
+                    ResultActions(copyText: text, shareText: ResultText.share(text, appName: L10n.appName))
+                        .id(outcome.label + "\(model.rotation)")
+                }
+            }
+            .frame(height: 32)
         }
         .frame(maxWidth: .infinity)
     }
@@ -66,7 +78,7 @@ struct RouletteScreen: View {
     private var resultStatus: some View {
         if let outcome = model.outcome {
             // 止まったスライスと同じ色で出す
-            let color = Theme.sliceColor(at: outcome.index)
+            let color = Theme.sliceAccent(at: outcome.index)
             Text(outcome.label)
                 .font(.title3.weight(.black))
                 .foregroundStyle(color)
@@ -100,5 +112,10 @@ struct RouletteScreen: View {
 }
 
 #Preview {
-    RouletteScreen()
+    RouletteScreen(model: RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems)))
+}
+
+#Preview("AX5") {
+    RouletteScreen(model: RouletteModel(items: ItemLabel.makeItems(L10n.defaultItems)))
+        .dynamicTypeSize(.accessibility5)
 }

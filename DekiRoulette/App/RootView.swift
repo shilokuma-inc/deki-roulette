@@ -9,6 +9,10 @@ struct RootView: View {
 
     @State private var selection: Tab = .roulette
 
+    // 両画面のモデルはここで持つ。設定シートから両方の項目を初期状態に戻せるよう environment にも流す。
+    @State private var rouletteModel = RouletteModel(store: ItemStore(key: .roulette) { L10n.defaultItems })
+    @State private var orderModel = OrderModel(store: ItemStore(key: .order) { L10n.orderDefaultItems })
+
     init() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -19,19 +23,20 @@ struct RootView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            RouletteScreen()
+            RouletteScreen(model: rouletteModel)
                 .tabItem { Label(L10n.rouletteNavLabel, systemImage: "circle.circle") }
                 .tag(Tab.roulette)
-            OrderScreen()
+            OrderScreen(model: orderModel)
                 .tabItem { Label(L10n.orderNavLabel, systemImage: "list.number") }
                 .tag(Tab.order)
         }
         .tint(Theme.ivory)
+        .environment(rouletteModel)
+        .environment(orderModel)
     }
 }
 
 #Preview {
     RootView()
-        .preferredColorScheme(.dark)
         .fontDesign(.rounded)
 }

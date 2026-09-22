@@ -33,6 +33,9 @@ enum Config {
     /// スピンのイージング（Web 版 `SPIN_EASING`）。`Theme.spinAnimation` と、クリック音の時刻の逆算の両方で使う。
     static let spinEasing = CubicBezierCurve(0.15, 0.85, 0.3, 1)
 
+    /// 追加の入力欄が伸びる行数の上限。改行区切りの貼り付けはこの行数を超えるとスクロールする。
+    static let bulkInputVisibleLines = 5
+
     // MARK: 効果音
 
     /// 効果音の ON/OFF を保存する `UserDefaults` のキー。未設定なら ON。

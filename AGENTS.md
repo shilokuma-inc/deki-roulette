@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Commands
 
@@ -9,7 +9,6 @@ xcodegen generate   # project.yml から DekiRoulette.xcodeproj を生成（.xco
 xcodebuild -project DekiRoulette.xcodeproj -scheme DekiRoulette -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
 xcodebuild -project DekiRoulette.xcodeproj -scheme DekiRoulette -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
 swift scripts/make-icon.swift DekiRoulette/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png  # アイコン再生成
-swift scripts/make-click-sound.swift DekiRoulette/Resources/Sounds/click.wav  # 回転音の再生成（--preview で 1 スピン分の試聴用）
 ```
 
 ファイルを追加・削除したら `xcodegen generate` を再実行する（`project.yml` はディレクトリ単位で sources を拾う）。
@@ -25,13 +24,6 @@ iOS 固有の差分は SPEC.md の「iOS 版との対応」に追記する。
 - ロジックは `Core/` の純粋関数に寄せ、乱数は `RandomNumberGenerator` を注入できるようにしてテストする（テストは Swift Testing）。
 - 文言は `Localizable.xcstrings` にだけ置き、`L10n` 経由で読む。表示言語は OS 設定に従い、アプリ内切替は持たない。
 - 配色・アニメーションは `Theme` に集約。`gold` は順番決めの 1 位とフォーカスリング専用（ルーレットの結果表示は止まったスライスと同じ色）、`flare` は開始ボタン専用。印に専用色は使わない。
-- 色は端末の外観設定に従う。トークンは `Color(light:dark:)` で 2 値を持ち、アプリ内に切替は置かない。
-  盤面と開始ボタンの塗りは外観に依らず固定（`onSlice` / `wheel*` / `onFlare`）で、スライス色を文字や
-  色見本に使うところは `sliceColor(at:)` ではなく `sliceAccent(at:)` を使う。追加した配色は
-  `ThemeContrastTests` でコントラスト比を検証する。
-- 項目リストは `ItemStore`（`Core/`）が画面ごとに `UserDefaults` へ保存する。保存するのは `id` と `label` だけで、
-  指定（`targetId` / `firstId` / `lastId`）は保存しない。保存データが無い・読めないときだけ `L10n` の初期項目を使う。
-  両モデルは `RootView` が生成して各 Screen に渡し、設定シートが両方を初期化できるよう environment にも流す。
 
 ### スピンの仕組み
 
@@ -42,15 +34,6 @@ iOS 固有の差分は SPEC.md の「iOS 版との対応」に追記する。
 `accessibilityReduceMotion` のときは回さず、`reducedMotionSpinDuration` 後に完了扱いにする。
 
 盤面は 12 時を 0 度、時計回り。`SliceShape` は `clockwise: false` で画面上は時計回りになる（y 軸が下向きのため）。
-
-### 回転音の仕組み
-
-スピン中は針がスライスの境目を越えるたびにクリック音を鳴らす。補間中の角度は observable でないので、
-`beginSpin` が `SpinTicks.boundaryCrossings`（`Config.spinEasing` を `CubicBezierCurve` で逆算）で鳴らす時刻を
-先に求め、`SpinSoundPlayer` が `ClickTrack` で 1 本の波形に焼いてから一度に流す（1 発ずつタイマーで鳴らすと
-リズムが揺れるため）。`Config.clickMinInterval` より詰まった時刻は間引く。音源は `Resources/Sounds/click.wav`
-（`scripts/make-click-sound.swift` で再生成）。`AVAudioSession` は `.ambient` で、消音スイッチに従い他アプリの
-音も止めない。`reducedMotion` では鳴らさない。ON/OFF は `@AppStorage(Config.soundEnabledKey)`。
 
 ### 並べ替えの仕組み
 

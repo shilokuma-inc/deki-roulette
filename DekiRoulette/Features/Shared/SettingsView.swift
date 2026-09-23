@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// ヘッダ右上のアイコンから開く設定。項目の初期化と著作権の項目を置く。
+/// ヘッダ右上のアイコンから開く設定。効果音の切り替えと項目の初期化、著作権の項目を置く。
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(Config.soundEnabledKey) private var soundEnabled = true
     // 両画面のモデルは RootView が environment に流している。どちらのタブから開いても両方を戻せる。
     @Environment(RouletteModel.self) private var rouletteModel
     @Environment(OrderModel.self) private var orderModel
@@ -21,6 +22,15 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    SettingsSection(title: L10n.soundTitle) {
+                        Toggle(L10n.soundToggle, isOn: $soundEnabled)
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.ivory)
+                            .tint(Theme.ivory)
+                        Text(L10n.soundNote)
+                            .font(.caption)
+                            .foregroundStyle(Theme.muted)
+                    }
                     SettingsSection(title: L10n.resetItemsTitle) {
                         Text(L10n.resetItemsDescription)
                             .font(.caption)

@@ -426,9 +426,11 @@ iOS 版には対応物が無い、または OS が代替する項目。
 | `aria-live` の結果通知 | `AccessibilityNotification.Announcement` | |
 | プリレンダ、SEO、sitemap、CSP、hreflang | 無し | Web 固有 |
 | ラベル 20 文字（UTF-16 単位） | 20 文字（`Character` 単位） | 絵文字等の結合文字で差が出る |
-| フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートの「著作権」項目 | 帰属の文（basekeita と Takumi Muraishi の連名）と `© 2026 basekeita, Takumi Muraishi` を載せる。設定の項目は現状これだけ（`SettingsView`） |
+| フッター末尾の著作権表示 | ヘッダ右上の設定アイコン（歯車）から開くシートの「著作権」項目 | 帰属の文（basekeita と Takumi Muraishi の連名）と `© 2026 basekeita, Takumi Muraishi` を載せる（`SettingsView`） |
 | 入力欄は 1 行、Enter で追加するとフォーカスが外れる | 入力欄は複数行（`TextField(axis: .vertical)`、最大 5 行で伸びる）。Return は末尾の改行として入るので、それを送信の合図にして追加し、フォーカスを保つ | 改行区切りの貼り付けは行ごとに正規化してまとめて追加する（`ItemLabel.splitLines`、§4.2）。1 行の入力欄では貼り付けた改行が見えないため複数行にした。20 文字の制限は行ごとに掛ける（`ItemLabel.clampLines`）。複数行のときは追加ボタンが「N 件追加」になり、上限を超える分は切り捨てて「項目は 24 個までです」で伝える（`addItems(_:)` が追加できた件数を返す） |
 | ローンチ画面は無い | `UILaunchScreen` の `UIColorName` に無地の `LaunchBackground`（Color Set） | ライト `#FAF7F2` / ダーク `#17111F` で `ink900` と同じ 2 値。ロゴやアプリ名は置かない。`ink900` を変えるときは Color Set も合わせる |
 | 状態は永続化しない（§1.3） | 項目リストを画面ごとに `UserDefaults` へ保存し、次の起動で復元する（`ItemStore`） | ホームに置いて繰り返し使うため。保存するのは項目の `id` と `label` だけで、当たり・先頭・末尾の指定は保存しない（端末を人に渡したあとで前回の仕込みが残っていると、次のスピンが意図せず同じ結果になるため。指定は起動のたびにまっさら）。追加・削除のたびに保存し、保存データが無い・読めないときだけ初期項目（§4.1、そのときの言語）を使う。一度も編集していなければ言語の切替に追従し、編集済みなら維持される。設定シートの「項目を初期状態に戻す」から画面ごとに戻せる（確認ダイアログ付き。保存データも消す） |
 | 「結果をコピー」は順番決めだけ（§7.3）。共有は無い | 両画面に「結果をコピー」と「共有」（`ShareLink`） | 結果があり演出が終わった後だけ、開始ボタンの下に出す。ルーレットのコピーは `結果: {ラベル}` の 1 行（見出し語は `resultHeading`、区切りは日英とも半角の「: 」）。共有本文はコピーの本文に空行を挟んでアプリ名（`appName`: 「デキレーレット」／「DekiRoulette」）を 1 行足したもの。本文の組み立ては `ResultText`（`Core/`）、ボタンは `ResultActions`（`Features/Shared/`）で両画面共通。共有シートのラベルはコピーと同じ `muted` 系で、開始ボタンの `flare` より目立たせない |
 | ブラウザの文字サイズ設定（固定 px のレイアウト） | Dynamic Type に追従（§10） | しきい値の判定は `TypeLayout`（`accessibility1` 以上でラベル 2 行・固定高さを緩める）。追加フォームは `ViewThatFits` で入力欄の最小幅（`@ScaledMetric` 160pt）を確保できなければ縦積み。盤面は追従させず、印の大きさも変えない |
+| 音は鳴らさない | スピン中の回転音（`SpinSoundPlayer`） | 針がスライスの境目を越えるたびに短いクリック音を鳴らす。鳴らす時刻は `SpinTicks` が `SPIN_EASING` を逆算して求め、32ms（`clickMinInterval`）より詰まったものは間引くので、序盤は連打、終盤は減速に合わせて間隔が開く。波形は `ClickTrack` が 1 本に合成して一度に流す。音源は `Resources/Sounds/click.wav`（`scripts/make-click-sound.swift` で生成）。`AVAudioSession` は `.ambient` なので消音スイッチに従い、他アプリの音は止めない。`accessibilityReduceMotion` では盤面が回らないので鳴らさない |
+| （設定は無し） | 設定シートの「効果音」 | 回転音の ON / OFF。既定は ON（`UserDefaults` の `soundEnabled`）。設定の項目は効果音・項目の初期化・著作権の 3 つ |
